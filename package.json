@@ -10,13 +10,27 @@
     "react-dom": "18.2.0",
     "react-scripts": "5.0.1",
     "react-router-dom": "^6.23.0",
-    "@supabase/supabase-js": "^2.50.0"
+    "@supabase/supabase-js": "^2.50.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@types/react": "18.2.38",
     "@types/react-dom": "18.2.15",
     "typescript": "4.4.4"
   },
+  {}
+    "compilerOptions": {
+      "jsx": "react-jsx",
+      "lib": ["dom", "es2022"],
+      "target": "es2020",
+      "module": "esnext",
+      "moduleResolution": "node",
+      "esModuleInterop": true,
+      "strict": true,
+      "skipLibCheck": true
+    }
+  }
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",

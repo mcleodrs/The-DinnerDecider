@@ -3,6 +3,8 @@
         "./src/**/*"
     ],
     "compilerOptions": {
+        "target": "es2020",
+        "module": "esnext",
         "strict": true,
         "esModuleInterop": true,
         "lib": [
