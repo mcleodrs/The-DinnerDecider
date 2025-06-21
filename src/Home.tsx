@@ -6,10 +6,10 @@ export default function Home() {
     <div style={{ padding: "2rem" }}>
       <h1>Welcome to The Dinner Decider</h1>
       <p>Please login:</p>
-      <Link to="/login">Login</Link>
+      <Link to="/Login">Login</Link>
       <br />
       <br />
-      <Link to="/dashboard">Go to Chef Dashboard</Link>
+      <Link to="/Dashboard">Go to Chef Dashboard</Link>
     </div>
   );
 }

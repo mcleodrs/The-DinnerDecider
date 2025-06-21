@@ -1,17 +1,15 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./Home";
+import Login from "./Login";
 import ChefDashboard from "./ChefDashboard";
-import Login from "./Login"; // add this import
-import CreateDinner from "./CreateDinner";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/Home" element={<Home />} />
-        <Route path="/dashboard" element={<ChefDashboard />} />
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/create-event" element={<CreateDinner />} />
+        <Route path="/dashboard" element={<ChefDashboard />} />
       </Routes>
     </Router>
   );
