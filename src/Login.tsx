@@ -1,50 +1,95 @@
 import { useState } from "react";
-import { supabase } from "./supabaseClient"; // import your client
 import { useNavigate } from "react-router-dom";
+import { supabase } from "./supabaseClient";
 
 export default function Login() {
   const navigate = useNavigate();
+  const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState(""); // for registration
   const [error, setError] = useState("");
 
-  async function handleLogin(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    if (isRegister) {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
 
-    if (error) {
-      setError(error.message);
+      if (signUpError) return setError(signUpError.message);
+
+      // Optionally create profile row
+      if (data.user) {
+        await supabase.from("users").insert([
+          {
+            id: data.user.id,
+            name: name,
+            email: email,
+          },
+        ]);
+      }
+
+      navigate("/dashboard");
     } else {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) return setError(signInError.message);
       navigate("/dashboard");
     }
   }
 
   return (
-    <form onSubmit={handleLogin} style={{ padding: "2rem" }}>
-      <h2>Login</h2>
+    <form onSubmit={handleSubmit} style={{ padding: "2rem" }}>
+      <h2>{isRegister ? "Register" : "Login"}</h2>
+
+      {isRegister && (
+        <>
+          <input
+            type="text"
+            placeholder="Your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+          <br />
+        </>
+      )}
+
       <input
         type="email"
-        placeholder="email"
+        placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         required
       />
       <br />
+
       <input
         type="password"
-        placeholder="password"
+        placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         required
       />
       <br />
-      <button type="submit">Sign In</button>
+
+      <button type="submit">{isRegister ? "Register" : "Login"}</button>
+
       {error && <p style={{ color: "red" }}>{error}</p>}
+
+      <p style={{ marginTop: "1rem" }}>
+        {isRegister ? "Already have an account?" : "Need an account?"}{" "}
+        <button type="button" onClick={() => setIsRegister(!isRegister)}>
+          {isRegister ? "Login" : "Register"}
+        </button>
+      </p>
     </form>
   );
 }
