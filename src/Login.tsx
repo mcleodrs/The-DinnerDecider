@@ -15,22 +15,39 @@ export default function Login() {
     setError("");
 
     if (isRegister) {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-      });
+      const { data: signUpData, error: signUpError } =
+        await supabase.auth.signUp({
+          email,
+          password,
+        });
 
-      if (signUpError) return setError(signUpError.message);
+      if (signUpError) {
+        setError(signUpError.message);
+        return;
+      }
 
-      // Optionally create profile row
-      if (data.user) {
-        await supabase.from("users").insert([
-          {
-            id: data.user.id,
-            name: name,
-            email: email,
-          },
-        ]);
+      // Wait for the auth session to be available
+      const user = signUpData.user;
+
+      if (!user) {
+        setError("Could not retrieve authenticated user.");
+        return;
+      }
+
+      // Now insert user profile securely
+      const { error: insertError } = await supabase.from("users").insert([
+        {
+          id: user.id, // 👈 links to auth.users
+          full_name: name,
+          email: user.email,
+          role: "Diner",
+          uitheme_pref: "red",
+        },
+      ]);
+
+      if (insertError) {
+        setError("Profile creation failed: " + insertError.message);
+        return;
       }
 
       navigate("/dashboard");
