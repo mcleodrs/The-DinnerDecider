@@ -1,41 +1,32 @@
 {
-  "name": "react-typescript",
+  "name": "the-dinner-decider",
   "version": "1.0.0",
-  "description": "React and TypeScript example starter project",
-  "keywords": ["typescript", "react", "starter"],
+  "description": "Dinner decision and event planning app",
+  "keywords": ["react", "typescript", "supabase", "vercel"],
   "main": "src/index.tsx",
-  "dependencies": {
-    "loader-utils": "3.2.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-scripts": "5.0.1",
-    "react-router-dom": "^6.23.0",
-    "@supabase/supabase-js": "^2.50.0",
-    "@types/react": "^18.2.0",
-    "@types/react-dom": "^18.2.0"
-  },
-  "devDependencies": {
-    "@types/react": "18.2.38",
-    "@types/react-dom": "18.2.15",
-    "typescript": "4.4.4"
-  },
-  {}
-    "compilerOptions": {
-      "jsx": "react-jsx",
-      "lib": ["dom", "es2022"],
-      "target": "es2020",
-      "module": "esnext",
-      "moduleResolution": "node",
-      "esModuleInterop": true,
-      "strict": true,
-      "skipLibCheck": true
-    }
-  }
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
   },
-  "browserslist": [">0.2%", "not dead", "not ie <= 11", "not op_mini all"]
+  "dependencies": {
+    "@supabase/supabase-js": "^2.50.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.23.0",
+    "react-scripts": "5.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.38",
+    "@types/react-dom": "^18.2.15",
+    "@types/react-router-dom": "^5.3.3",
+    "typescript": "^4.9.5"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
