@@ -1,112 +1,103 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "./supabaseClient";
+import { supabase } from "./supabaseClient"; // adjust path if needed
 
 export default function Login() {
-  const navigate = useNavigate();
   const [isRegister, setIsRegister] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [name, setName] = useState(""); // for registration
+  const [fullName, setFullName] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  async function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
-    if (isRegister) {
-      const { data: signUpData, error: signUpError } =
-        await supabase.auth.signUp({
+    try {
+      let authResponse;
+
+      if (isRegister) {
+        // Create a new user
+        authResponse = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: fullName,
+              role: "Diner", // Default for now
+              ui_theme_pref: "red",
+            },
+          },
+        });
+      } else {
+        // Login existing user
+        authResponse = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-
-      if (signUpError) {
-        setError(signUpError.message);
-        return;
       }
 
-      // Wait for the auth session to be available
-      const user = signUpData.user;
-
-      if (!user) {
-        setError("Could not retrieve authenticated user.");
-        return;
+      if (authResponse.error) {
+        throw authResponse.error;
       }
 
-      // Now insert user profile securely
-      const { error: insertError } = await supabase.from("users").insert([
-        {
-          id: user.id, // 👈 links to auth.users
-          full_name: name,
-          email: user.email,
-          role: "Diner",
-          uitheme_pref: "red",
-        },
-      ]);
+      // ✅ Redirect based on user metadata
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-      if (insertError) {
-        setError("Profile creation failed: " + insertError.message);
-        return;
+      const role = user?.user_metadata?.role;
+
+      if (role === "Chef") {
+        navigate("/dashboard");
+      } else {
+        navigate("/user");
       }
-
-      navigate("/dashboard");
-    } else {
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (signInError) return setError(signInError.message);
-      navigate("/dashboard");
+    } catch (err: any) {
+      setError(err.message || "Authentication failed.");
     }
-  }
+  };
 
   return (
-    <form onSubmit={handleSubmit} style={{ padding: "2rem" }}>
-      <h2>{isRegister ? "Register" : "Login"}</h2>
-
-      {isRegister && (
-        <>
-          <input
-            type="text"
-            placeholder="Your name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <br />
-        </>
-      )}
-
-      <input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        required
-      />
-      <br />
-
-      <input
-        type="password"
-        placeholder="Password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        required
-      />
-      <br />
-
-      <button type="submit">{isRegister ? "Register" : "Login"}</button>
-
+    <div style={{ padding: "2rem" }}>
+      <h1>{isRegister ? "Register" : "Login"}</h1>
+      <form onSubmit={handleSubmit}>
+        {isRegister && (
+          <div>
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              required
+            />
+            <br />
+          </div>
+        )}
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+        />
+        <br />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <br />
+        <button type="submit">{isRegister ? "Register" : "Login"}</button>
+      </form>
       {error && <p style={{ color: "red" }}>{error}</p>}
-
-      <p style={{ marginTop: "1rem" }}>
-        {isRegister ? "Already have an account?" : "Need an account?"}{" "}
-        <button type="button" onClick={() => setIsRegister(!isRegister)}>
-          {isRegister ? "Login" : "Register"}
-        </button>
-      </p>
-    </form>
+      <br />
+      <button onClick={() => setIsRegister(!isRegister)}>
+        {isRegister ? "Already have an account? Login" : "New here? Register"}
+      </button>
+    </div>
   );
 }
