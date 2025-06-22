@@ -5,6 +5,18 @@ import ChefDashboard from "./ChefDashboard";
 import CreateDinner from "./CreateDinner";
 import UserProfile from "./UserProfile";
 
+// src/index.tsx (or App.tsx)
+import React from "react";
+import ReactDOM from "react-dom";
+import { AuthProvider } from "./auth";
+
+ReactDOM.render(
+  <AuthProvider>
+    <App />
+  </AuthProvider>,
+  document.getElementById("root")
+);
+
 function App() {
   return (
     <Router>
