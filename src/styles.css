@@ -1,4 +1,66 @@
+/* Global app styles */
+body {
+  margin: 0;
+  font-family: "Segoe UI", sans-serif;
+}
+
+/* Container styling */
 .App {
   font-family: sans-serif;
   text-align: center;
+}
+
+/* Red Theme - Default (matches AppBackGround.png) */
+.red {
+  background-image: url("/project/workspace/public/AppBackGround.png");
+  background-size: cover;
+  background-repeat: repeat;
+  background-attachment: fixed;
+  color: #380101;
+}
+
+/* Additional Theme Options (scaffolded for future use) */
+.blue {
+  background-color: #ddeeff;
+  color: #222;
+}
+
+.dark {
+  background-color: #222;
+  color: #fff;
+}
+
+.green {
+  background-color: #e7fce9;
+  color: #222;
+}
+
+.brown {
+  background-color: #f7efe5;
+  color: #3b2f2f;
+}
+
+/* Add any reusable components below */
+button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+input {
+  padding: 0.5rem;
+  margin: 0.5rem 0;
+  border-radius: 0.25rem;
+  border: 1px solid #ccc;
+}
+
+.profile-container {
+  background-color: rgba(255, 255, 255, 0.9); /* light background, 90% opaque */
+  border-radius: 1rem;
+  padding: 2rem;
+  max-width: 500px;
+  margin: 2rem auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }

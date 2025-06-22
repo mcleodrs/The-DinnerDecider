@@ -1,34 +1,46 @@
+import { useEffect, useState } from "react";
+import { supabase } from "./supabaseClient";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./Home";
 import Login from "./Login";
 import ChefDashboard from "./ChefDashboard";
-import CreateDinner from "./CreateDinner";
 import UserProfile from "./UserProfile";
+import "./styles.css"; // 👈 make sure this matches your filename
 
-// src/index.tsx (or App.tsx)
-import React from "react";
-import ReactDOM from "react-dom";
-import { AuthProvider } from "./auth";
+export default function App() {
+  const [themeClass, setThemeClass] = useState("red"); // default theme
 
-ReactDOM.render(
-  <AuthProvider>
-    <App />
-  </AuthProvider>,
-  document.getElementById("root")
-);
+  useEffect(() => {
+    async function loadTheme() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
 
-function App() {
+      const { data, error } = await supabase
+        .from("users")
+        .select("uitheme_pref")
+        .eq("id", user.id)
+        .single();
+
+      if (!error && data?.uitheme_pref) {
+        setThemeClass(data.uitheme_pref);
+      }
+    }
+
+    loadTheme();
+  }, []);
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<ChefDashboard />} />
-        <Route path="/create" element={<CreateDinner />} />
-        <Route path="/user" element={<UserProfile />} /> {/* NEW ROUTE */}
-      </Routes>
-    </Router>
+    <div className={`App ${themeClass}`}>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={<ChefDashboard />} />
+          <Route path="/user" element={<UserProfile />} />
+        </Routes>
+      </Router>
+    </div>
   );
 }
-
-export default App;

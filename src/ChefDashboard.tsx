@@ -56,59 +56,71 @@ export default function ChefDashboard() {
   if (error) return <p style={{ color: "red", padding: "2rem" }}>{error}</p>;
 
   return (
-    <main style={{ padding: "2rem" }}>
-      <h1>Chef’s Dashboard</h1>
+    <div
+      style={{
+        backgroundImage: 'url("/project/workspace/public/AppBackGround.png")',
+        backgroundSize: "cover",
+        backgroundRepeat: "repeat",
+        minHeight: "100vh",
+        padding: "1rem",
+      }}
+    >
+      {
+        <main style={{ padding: "2rem" }}>
+          <h1>Chef’s Dashboard</h1>
 
-      {profile && (
-        <div style={{ marginBottom: "1rem" }}>
-          <h2>Welcome, {profile.full_name}!</h2>
-          <p>
-            You are logged in as a <strong>{profile.role}</strong>.
-          </p>
-        </div>
-      )}
+          {profile && (
+            <div style={{ marginBottom: "1rem" }}>
+              <h2>Welcome, {profile.full_name}!</h2>
+              <p>
+                You are logged in as a <strong>{profile.role}</strong>.
+              </p>
+            </div>
+          )}
 
-      {/* Tab Navigation */}
-      <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
-        <button
-          onClick={() => setActiveTab("pantry")}
-          style={tabStyle(activeTab === "pantry")}
-        >
-          🧺 Pantry
-        </button>
-        <button
-          onClick={() => setActiveTab("dine_in")}
-          style={tabStyle(activeTab === "dine_in")}
-        >
-          🏠 Dine In
-        </button>
-        <button
-          onClick={() => setActiveTab("dine_out")}
-          style={tabStyle(activeTab === "dine_out")}
-        >
-          🍔 Dine Out
-        </button>
-      </div>
+          {/* Tab Navigation */}
+          <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+            <button
+              onClick={() => setActiveTab("pantry")}
+              style={tabStyle(activeTab === "pantry")}
+            >
+              🧺 Pantry
+            </button>
+            <button
+              onClick={() => setActiveTab("dine_in")}
+              style={tabStyle(activeTab === "dine_in")}
+            >
+              🏠 Dine In
+            </button>
+            <button
+              onClick={() => setActiveTab("dine_out")}
+              style={tabStyle(activeTab === "dine_out")}
+            >
+              🍔 Dine Out
+            </button>
+          </div>
 
-      {/* Active Section */}
-      <div style={{ marginTop: "1rem" }}>
-        {activeTab === "pantry" && <PantrySection />}
-        {activeTab === "dine_in" && <DineInSection />}
-        {activeTab === "dine_out" && <DineOutSection />}
-      </div>
+          {/* Active Section */}
+          <div style={{ marginTop: "1rem" }}>
+            {activeTab === "pantry" && <PantrySection />}
+            {activeTab === "dine_in" && <DineInSection />}
+            {activeTab === "dine_out" && <DineOutSection />}
+          </div>
 
-      {/* Future Actions */}
-      <div style={{ marginTop: "2rem" }}>
-        <button onClick={() => navigate("/create-event")}>
-          ➕ Create Event
-        </button>
-        <br />
-        <br />
-        <button onClick={() => alert("📅 Calendar view coming soon!")}>
-          📅 View Calendar
-        </button>
-      </div>
-    </main>
+          {/* Future Actions */}
+          <div style={{ marginTop: "2rem" }}>
+            <button onClick={() => navigate("/create-event")}>
+              ➕ Create Event
+            </button>
+            <br />
+            <br />
+            <button onClick={() => alert("📅 Calendar view coming soon!")}>
+              📅 View Calendar
+            </button>
+          </div>
+        </main>
+      }
+    </div>
   );
 }
 
