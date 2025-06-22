@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom"; // ✅ no need for BrowserRouter here
 import Home from "./Home";
 import Login from "./Login";
 import ChefDashboard from "./ChefDashboard";
 import UserProfile from "./UserProfile";
-import "./styles.css"; // 👈 make sure this matches your filename
+import "./styles.css";
+import CreateDinner from "./CreateDinner";
+import NavBar from "./NavBar"; // add at top
 
 export default function App() {
-  const [themeClass, setThemeClass] = useState("red"); // default theme
+  const [themeClass, setThemeClass] = useState("red");
 
   useEffect(() => {
     async function loadTheme() {
@@ -33,14 +35,14 @@ export default function App() {
 
   return (
     <div className={`App ${themeClass}`}>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<ChefDashboard />} />
-          <Route path="/user" element={<UserProfile />} />
-        </Routes>
-      </Router>
+      <NavBar /> {/* ✅ Persistent Navigation */}
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/dashboard" element={<ChefDashboard />} />
+        <Route path="/user" element={<UserProfile />} />
+        <Route path="/create-event" element={<CreateDinner />} />
+      </Routes>
     </div>
   );
 }

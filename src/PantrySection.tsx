@@ -1,103 +1,192 @@
-import { useState, useEffect } from "react";
-import { supabase } from "./supabaseClient"; // make sure you have supabaseClient.ts in place
-import { useAuth } from "./auth"; // Custom hook to handle auth context
+import { useEffect, useState } from "react";
+import { supabase } from "./supabaseClient";
 
-// Interface for a meal item
-interface Meal {
+type Meal = {
   id: string;
   name: string;
   is_favorite: boolean;
-}
+  ingredients?: string;
+  process?: string;
+  secret?: string;
+};
 
-const PantrySection = () => {
-  const { user } = useAuth(); // Assuming you have a context that provides the current user
+export default function PantrySection() {
   const [meals, setMeals] = useState<Meal[]>([]);
-  const [error, setError] = useState<string | null>(null);
+  const [newMealName, setNewMealName] = useState("");
+  const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
+  const [editing, setEditing] = useState(false);
 
   useEffect(() => {
-    const fetchMeals = async () => {
-      if (!user) {
-        setError("User not logged in.");
-        return;
-      }
-
-      try {
-        // Fetch meals from Supabase pantry based on user (chefId from authenticated user)
-        const { data, error } = await supabase
-          .from("pantry_meals")
-          .select("id, name, is_favorite")
-          .eq("chef_id", user.id); // Assuming user.id is your chef's unique identifier in Supabase
-
-        if (error) {
-          throw error;
-        }
-
-        setMeals(data || []);
-      } catch (err: any) {
-        setError(err.message || "Failed to load pantry meals.");
-      }
-    };
-
     fetchMeals();
-  }, [user]);
+  }, []);
 
-  const toggleFavorite = async (mealId: string) => {
-    try {
-      const mealToUpdate = meals.find((meal) => meal.id === mealId);
-      if (!mealToUpdate) return;
+  const fetchMeals = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-      const updatedFavoriteStatus = !mealToUpdate.is_favorite;
+    const { data, error } = await supabase
+      .from("pantry_meals")
+      .select("*")
+      .eq("chef_id", user?.id)
+      .order("created_at", { ascending: false });
 
-      // Update the favorite status in the database
-      const { error } = await supabase
-        .from("pantry_meals")
-        .update({ is_favorite: updatedFavoriteStatus })
-        .eq("id", mealId);
+    if (!error) setMeals(data || []);
+  };
 
-      if (error) {
-        throw error;
-      }
+  const addMeal = async () => {
+    if (!newMealName.trim()) return;
 
-      // Update local state to reflect the change
-      setMeals((prevMeals) =>
-        prevMeals.map((meal) =>
-          meal.id === mealId
-            ? { ...meal, is_favorite: updatedFavoriteStatus }
-            : meal
-        )
-      );
-    } catch (err: any) {
-      setError(err.message || "Failed to toggle favorite.");
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const { error } = await supabase
+      .from("pantry_meals")
+      .insert({ name: newMealName, chef_id: user?.id, is_favorite: false });
+
+    if (!error) {
+      setNewMealName("");
+      await fetchMeals();
     }
   };
 
-  if (error) {
-    return <div className="error-message">{error}</div>;
-  }
+  const updateMeal = async () => {
+    if (!selectedMeal) return;
+
+    const { error } = await supabase
+      .from("pantry_meals")
+      .update({
+        name: selectedMeal.name,
+        is_favorite: selectedMeal.is_favorite,
+        ingredients: selectedMeal.ingredients,
+        process: selectedMeal.process,
+        secret: selectedMeal.secret,
+      })
+      .eq("id", selectedMeal.id);
+
+    if (!error) {
+      setEditing(false);
+      await fetchMeals();
+    }
+  };
+
+  const deleteMeal = async () => {
+    if (!selectedMeal) return;
+
+    const { error } = await supabase
+      .from("pantry_meals")
+      .delete()
+      .eq("id", selectedMeal.id);
+
+    if (!error) {
+      setSelectedMeal(null);
+      setEditing(false);
+      await fetchMeals();
+    }
+  };
 
   return (
-    <div>
-      <h2>Your Pantry</h2>
-      <div className="pantry-meals">
-        {meals.length === 0 ? (
-          <p>No meals found in your pantry.</p>
-        ) : (
-          <ul>
-            {meals.map((meal) => (
-              <li key={meal.id} className="meal-item">
-                <span>{meal.name}</span>
-                <button onClick={() => toggleFavorite(meal.id)}>
-                  {meal.is_favorite
-                    ? "Remove from favorites"
-                    : "Add to favorites"}
-                </button>
-              </li>
-            ))}
-          </ul>
-        )}
+    <div className="profile-container">
+      <h2>Pantry Meals</h2>
+
+      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
+        <input
+          type="text"
+          value={newMealName}
+          onChange={(e) => setNewMealName(e.target.value)}
+          placeholder="New meal name"
+        />
+        <button onClick={addMeal}>Add Meal</button>
       </div>
+
+      {meals.length === 0 ? (
+        <p>No meals added yet.</p>
+      ) : (
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {meals.map((meal) => (
+            <li
+              key={meal.id}
+              onClick={() => {
+                setSelectedMeal(meal);
+                setEditing(true);
+              }}
+              style={{
+                marginBottom: "0.5rem",
+                cursor: "pointer",
+                backgroundColor:
+                  selectedMeal?.id === meal.id ? "#f0f0f0" : "transparent",
+                padding: "0.5rem",
+                borderRadius: "8px",
+              }}
+            >
+              {meal.is_favorite ? "⭐ " : "🍽️ "}
+              {meal.name}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {editing && selectedMeal && (
+        <div style={{ marginTop: "2rem" }}>
+          <h3>Edit Meal: {selectedMeal.name}</h3>
+          <input
+            type="text"
+            value={selectedMeal.name}
+            onChange={(e) =>
+              setSelectedMeal({ ...selectedMeal, name: e.target.value })
+            }
+            placeholder="Meal Name"
+          />
+          <br />
+          <label>
+            <input
+              type="checkbox"
+              checked={selectedMeal.is_favorite}
+              onChange={(e) =>
+                setSelectedMeal({
+                  ...selectedMeal,
+                  is_favorite: e.target.checked,
+                })
+              }
+            />{" "}
+            Mark as Favorite
+          </label>
+          <br />
+          <textarea
+            placeholder="Ingredients"
+            value={selectedMeal.ingredients || ""}
+            onChange={(e) =>
+              setSelectedMeal({ ...selectedMeal, ingredients: e.target.value })
+            }
+            style={{ width: "100%", height: "60px", marginTop: "0.5rem" }}
+          />
+          <textarea
+            placeholder="Process (Optional)"
+            value={selectedMeal.process || ""}
+            onChange={(e) =>
+              setSelectedMeal({ ...selectedMeal, process: e.target.value })
+            }
+            style={{ width: "100%", height: "60px", marginTop: "0.5rem" }}
+          />
+          <textarea
+            placeholder="Secret (Optional)"
+            value={selectedMeal.secret || ""}
+            onChange={(e) =>
+              setSelectedMeal({ ...selectedMeal, secret: e.target.value })
+            }
+            style={{ width: "100%", height: "60px", marginTop: "0.5rem" }}
+          />
+          <br />
+          <button onClick={updateMeal}>💾 Save</button>{" "}
+          <button
+            onClick={deleteMeal}
+            style={{ backgroundColor: "#c00", color: "#fff" }}
+          >
+            🗑 Delete
+          </button>
+        </div>
+      )}
     </div>
   );
-};
-
-export default PantrySection;
+}

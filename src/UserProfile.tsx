@@ -14,9 +14,11 @@ interface UserProfileData {
 interface Event {
   id: string;
   title: string;
+  location: string;
   event_date: string;
   event_time: string;
-  location: string;
+  details: string;
+  theme_color: string;
 }
 
 export default function UserProfile() {
@@ -27,6 +29,7 @@ export default function UserProfile() {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   const [events, setEvents] = useState<Event[]>([]);
+  const [eventIndex, setEventIndex] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -58,12 +61,16 @@ export default function UserProfile() {
 
       const today = new Date().toISOString().split("T")[0];
 
-      const { data: upcomingEvents } = await supabase
+      /*const { data: upcomingEvents } = await supabase
         .from("events")
         .select("*")
         .eq("chef_id", user.id)
         .gte("event_date", today)
-        .order("event_date", { ascending: true });
+        .order("event_date", { ascending: true });*/
+      const { data: upcomingEvents, error: eventError } = await supabase
+        .from("events")
+        .select("*")
+        .eq("chef_id", user.id);
 
       if (upcomingEvents) setEvents(upcomingEvents);
 
@@ -102,19 +109,19 @@ export default function UserProfile() {
 
       <div>
         <label>
-          Email:
-          <input type="text" value={profile?.email || ""} disabled />
-        </label>
-      </div>
-
-      <div>
-        <label>
-          Full Name:
+          Name:
           <input
             type="text"
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
           />
+        </label>
+      </div>
+
+      <div>
+        <label>
+          Email:
+          <input type="text" value={profile?.email || ""} disabled />
         </label>
       </div>
 

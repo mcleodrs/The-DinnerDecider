@@ -1,108 +1,164 @@
-import { useEffect, useState } from "react";
-import { supabase } from "./supabaseClient";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-type PantryMeal = {
-  id: string;
-  name: string;
-  is_favorite: boolean;
-};
+import { supabase } from "./supabaseClient";
 
 export default function CreateDinner() {
-  const [pantryMeals, setPantryMeals] = useState<PantryMeal[]>([]);
-  const [selectedMealId, setSelectedMealId] = useState<string>("");
+  const [title, setTitle] = useState("");
+  const [location, setLocation] = useState("");
+  const [eventDate, setEventDate] = useState("");
+  const [eventTime, setEventTime] = useState("");
+  const [details, setDetails] = useState("");
+  const [dinnerType, setDinnerType] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Fetch authenticated user + their pantry meals
   useEffect(() => {
-    async function fetchData() {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
-
-      if (userError || !user) {
-        setError("Could not retrieve user.");
+    async function fetchUser() {
+      const { data, error } = await supabase.auth.getUser();
+      if (error || !data?.user) {
+        setError("You must be logged in to create a dinner.");
         return;
       }
-
-      setUserId(user.id);
-
-      const { data, error: pantryError } = await supabase
-        .from("pantry_meals")
-        .select("id, name, is_favorite")
-        .eq("chef_id", user.id);
-
-      if (pantryError) {
-        setError("Failed to load pantry meals.");
-      } else {
-        setPantryMeals(data as PantryMeal[]);
-      }
+      setUserId(data.user.id);
     }
-
-    fetchData();
+    fetchUser();
   }, []);
 
-  async function handleCreateEvent(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
-
-    if (!userId || !selectedMealId) {
-      setError("Missing required information.");
-      setLoading(false);
+    if (!userId) {
+      setError("User not authenticated.");
       return;
     }
 
     const { error: insertError } = await supabase.from("events").insert([
       {
+        title,
+        location,
+        event_date: eventDate,
+        event_time: eventTime,
+        details,
         chef_id: userId,
-        meal_id: selectedMealId,
-        // You may add: location, time, details, etc.
+        theme_color: "red",
+        theme_style: "classic",
       },
     ]);
 
-    setLoading(false);
-
     if (insertError) {
-      setError("Failed to create event: " + insertError.message);
-    } else {
-      navigate("/dashboard"); // Or wherever you want to go after success
+      console.error(insertError);
+      setError("Failed to create event.");
+      return;
     }
-  }
+
+    navigate("/user");
+  };
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <h2>Create Dinner Event</h2>
+    <div
+      style={{
+        padding: "2rem",
+        maxWidth: "500px",
+        margin: "2rem auto",
+        backgroundColor: "rgba(255,255,255,0.95)",
+        borderRadius: "12px",
+        boxShadow: "0 0 10px rgba(0,0,0,0.2)",
+      }}
+    >
+      <h1 style={{ textAlign: "center", marginBottom: "1.5rem" }}>
+        Create Dinner
+      </h1>
 
-      <form onSubmit={handleCreateEvent}>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+      >
         <label>
-          Select a Meal:
-          <select
-            value={selectedMealId}
-            onChange={(e) => setSelectedMealId(e.target.value)}
+          Title:
+          <input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             required
-          >
-            <option value="">-- Select One --</option>
-            {pantryMeals.map((meal) => (
-              <option key={meal.id} value={meal.id}>
-                {meal.name}
-              </option>
-            ))}
-          </select>
+          />
         </label>
 
-        <br />
-        <br />
+        <label>
+          Location:
+          <input
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            required
+          />
+        </label>
 
-        <button type="submit" disabled={loading}>
-          {loading ? "Creating..." : "Create Dinner"}
+        <div style={{ display: "flex", gap: "1rem" }}>
+          <label style={{ flex: 1 }}>
+            Date:
+            <input
+              type="date"
+              value={eventDate}
+              onChange={(e) => setEventDate(e.target.value)}
+              required
+            />
+          </label>
+
+          <label style={{ flex: 1 }}>
+            Time:
+            <input
+              type="time"
+              value={eventTime}
+              onChange={(e) => setEventTime(e.target.value)}
+              required
+            />
+          </label>
+        </div>
+
+        <label>
+          Details:
+          <textarea
+            rows={3}
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
+          />
+        </label>
+
+        <div>
+          <p style={{ marginBottom: "0.5rem", fontWeight: "bold" }}>
+            Choose Dinner Type:
+          </p>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              gap: "1rem",
+              flexWrap: "wrap",
+            }}
+          >
+            {["PANTRY", "LEFTOVERS", "DINE_IN", "DINE_OUT"].map((type) => (
+              <button
+                key={type}
+                type="button"
+                onClick={() => setDinnerType(type)}
+                style={{
+                  padding: "0.5rem 1rem",
+                  border:
+                    dinnerType === type ? "2px solid black" : "1px solid gray",
+                  backgroundColor: dinnerType === type ? "#f0c040" : "#eee",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                }}
+              >
+                {type.replace("_", " ")}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <button type="submit" style={{ padding: "0.75rem", marginTop: "1rem" }}>
+          Submit Dinner
         </button>
-
-        {error && <p style={{ color: "red" }}>{error}</p>}
       </form>
     </div>
   );
