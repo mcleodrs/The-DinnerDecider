@@ -20,7 +20,8 @@ export default function DineInSection() {
     name: string;
     url: string;
     notes: string;
-  }>({ name: "", url: "", notes: "" });
+    is_favorite: boolean;
+  }>({ name: "", url: "", notes: "", is_favorite: false });
 
   useEffect(() => {
     fetchOptions();
@@ -47,8 +48,10 @@ export default function DineInSection() {
       .select();
 
     if (!error && data) {
-      setOptions([...options, data[0]]);
+      setOptions((prev) => [...prev, data[0]]);
       setNewOptionName("");
+    } else {
+      console.error("Add option failed:", error?.message);
     }
   }
 
@@ -58,6 +61,7 @@ export default function DineInSection() {
       name: option.name,
       url: option.url || "",
       notes: option.notes || "",
+      is_favorite: option.is_favorite || false,
     });
   }
 
@@ -68,25 +72,20 @@ export default function DineInSection() {
       .eq("id", id);
 
     if (!error) {
+      setOptions((prevOptions) =>
+        prevOptions.map((opt) =>
+          opt.id === id ? { ...opt, ...editData } : opt
+        )
+      );
       setEditingId(null);
-      fetchOptions();
+    } else {
+      console.error("Failed to save edit:", error.message);
     }
-  }
-
-  async function toggleFavorite(
-    id: string,
-    current: boolean | null | undefined
-  ) {
-    await supabase
-      .from("dine_in_options")
-      .update({ is_favorite: !current })
-      .eq("id", id);
-    fetchOptions();
   }
 
   async function deleteOption(id: string) {
     await supabase.from("dine_in_options").delete().eq("id", id);
-    setOptions(options.filter((opt) => opt.id !== id));
+    setOptions((prev) => prev.filter((opt) => opt.id !== id));
   }
 
   return (
@@ -142,6 +141,21 @@ export default function DineInSection() {
                 style={{ width: "100%", marginTop: "0.5rem" }}
               />
               <div style={{ marginTop: "0.5rem" }}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={editData.is_favorite}
+                    onChange={(e) =>
+                      setEditData({
+                        ...editData,
+                        is_favorite: e.target.checked,
+                      })
+                    }
+                  />{" "}
+                  Mark as Favorite
+                </label>
+              </div>
+              <div style={{ marginTop: "0.5rem" }}>
                 <button onClick={() => saveEdit(option.id)}>Save</button>{" "}
                 <button onClick={() => setEditingId(null)}>Cancel</button>{" "}
                 <button onClick={() => deleteOption(option.id)}>Delete</button>
@@ -156,29 +170,19 @@ export default function DineInSection() {
                   marginBottom: "0.25rem",
                   display: "flex",
                   alignItems: "center",
-                  justifyContent: "space-between",
+                  gap: "0.5rem",
                 }}
               >
-                <span>{option.name}</span>
-                <span
-                  style={{ fontSize: "1.25rem", cursor: "pointer" }}
-                  title="Favorite"
-                >
+                <span style={{ fontSize: "1.25rem" }}>
                   {option.is_favorite ? "★" : ""}
                 </span>
+                <span>{option.name}</span>
               </h4>
               {option.notes && (
                 <p style={{ fontStyle: "italic", marginBottom: "0.5rem" }}>
                   {option.notes}
                 </p>
               )}
-              <div>
-                <button
-                  onClick={() => toggleFavorite(option.id, option.is_favorite)}
-                >
-                  {option.is_favorite ? "Unfavorite" : "Mark Favorite"}
-                </button>
-              </div>
             </>
           )}
         </div>
