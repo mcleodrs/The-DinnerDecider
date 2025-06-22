@@ -1,165 +1,195 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
 
+type Option = {
+  id: string;
+  name: string;
+};
+
 export default function CreateDinner() {
+  const [activeTab, setActiveTab] = useState<"pantry" | "dine_in" | "dine_out">(
+    "pantry"
+  );
+
+  const [pantryOptions, setPantryOptions] = useState<Option[]>([]);
+  const [dineInOptions, setDineInOptions] = useState<Option[]>([]);
+  const [dineOutOptions, setDineOutOptions] = useState<Option[]>([]);
+
+  const [selectedPantry, setSelectedPantry] = useState<string[]>([]);
+  const [selectedDineIn, setSelectedDineIn] = useState<string[]>([]);
+  const [selectedDineOut, setSelectedDineOut] = useState<string[]>([]);
+
   const [title, setTitle] = useState("");
   const [location, setLocation] = useState("");
   const [eventDate, setEventDate] = useState("");
   const [eventTime, setEventTime] = useState("");
   const [details, setDetails] = useState("");
-  const [dinnerType, setDinnerType] = useState("");
-  const [userId, setUserId] = useState<string | null>(null);
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
 
   useEffect(() => {
-    async function fetchUser() {
-      const { data, error } = await supabase.auth.getUser();
-      if (error || !data?.user) {
-        setError("You must be logged in to create a dinner.");
-        return;
-      }
-      setUserId(data.user.id);
-    }
-    fetchUser();
+    loadAllOptions();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!userId) {
-      setError("User not authenticated.");
-      return;
-    }
+  async function loadAllOptions() {
+    const user = (await supabase.auth.getUser()).data.user;
 
-    const { error: insertError } = await supabase.from("events").insert([
-      {
-        title,
-        location,
-        event_date: eventDate,
-        event_time: eventTime,
-        details,
-        chef_id: userId,
-        theme_color: "red",
-        theme_style: "classic",
-      },
-    ]);
+    const fetch = async (table: string) => {
+      const { data, error } = await supabase
+        .from(table)
+        .select("id, name")
+        .eq("chef_id", user?.id);
+      return data || [];
+    };
 
-    if (insertError) {
-      console.error(insertError);
-      setError("Failed to create event.");
-      return;
-    }
+    setPantryOptions(await fetch("pantry_meals"));
+    setDineInOptions(await fetch("dine_in_options"));
+    setDineOutOptions(await fetch("dine_out_restaurants"));
+  }
 
-    navigate("/user");
+  const handleToggle = (
+    id: string,
+    type: "pantry" | "dine_in" | "dine_out"
+  ) => {
+    const stateSetter = {
+      pantry: setSelectedPantry,
+      dine_in: setSelectedDineIn,
+      dine_out: setSelectedDineOut,
+    }[type];
+
+    const stateGetter = {
+      pantry: selectedPantry,
+      dine_in: selectedDineIn,
+      dine_out: selectedDineOut,
+    }[type];
+
+    const updated = stateGetter.includes(id)
+      ? stateGetter.filter((x) => x !== id)
+      : [...stateGetter, id];
+
+    stateSetter(updated);
+  };
+
+  const handleSubmit = () => {
+    alert("Submit logic will go here");
+  };
+
+  const renderSelectionList = () => {
+    const allSelected = [
+      ...selectedPantry.map(
+        (id) => pantryOptions.find((opt) => opt.id === id)?.name || ""
+      ),
+      ...selectedDineIn.map(
+        (id) => dineInOptions.find((opt) => opt.id === id)?.name || ""
+      ),
+      ...selectedDineOut.map(
+        (id) => dineOutOptions.find((opt) => opt.id === id)?.name || ""
+      ),
+    ].filter(Boolean);
+
+    return allSelected.length > 0 ? (
+      <div style={{ marginBottom: "1rem" }}>
+        <h4>Selected Event Options:</h4>
+        <ul>
+          {allSelected.map((name, index) => (
+            <li key={index}>{name}</li>
+          ))}
+        </ul>
+      </div>
+    ) : null;
   };
 
   return (
-    <div
-      style={{
-        padding: "2rem",
-        maxWidth: "500px",
-        margin: "2rem auto",
-        backgroundColor: "rgba(255,255,255,0.95)",
-        borderRadius: "12px",
-        boxShadow: "0 0 10px rgba(0,0,0,0.2)",
-      }}
-    >
-      <h1 style={{ textAlign: "center", marginBottom: "1.5rem" }}>
-        Create Dinner
-      </h1>
+    <div className="profile-container">
+      <h1>Create Event</h1>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      <label>Event Title:</label>
+      <input value={title} onChange={(e) => setTitle(e.target.value)} />
 
-      <form
-        onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+      <label>Location:</label>
+      <input value={location} onChange={(e) => setLocation(e.target.value)} />
+
+      <label>Date:</label>
+      <input
+        type="date"
+        value={eventDate}
+        onChange={(e) => setEventDate(e.target.value)}
+      />
+
+      <label>Time:</label>
+      <input
+        type="time"
+        value={eventTime}
+        onChange={(e) => setEventTime(e.target.value)}
+      />
+
+      <label>Details:</label>
+      <textarea value={details} onChange={(e) => setDetails(e.target.value)} />
+
+      <h3>Choose Event Options:</h3>
+      <div
+        style={{
+          display: "flex",
+          gap: "1rem",
+          justifyContent: "center",
+          marginBottom: "1rem",
+        }}
       >
-        <label>
-          Title:
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-          />
-        </label>
+        <button onClick={() => setActiveTab("pantry")}>🧺 Pantry</button>
+        <button onClick={() => setActiveTab("dine_in")}>🏠 Dine In</button>
+        <button onClick={() => setActiveTab("dine_out")}>🍔 Dine Out</button>
+      </div>
 
-        <label>
-          Location:
-          <input
-            value={location}
-            onChange={(e) => setLocation(e.target.value)}
-            required
-          />
-        </label>
+      {renderSelectionList()}
 
-        <div style={{ display: "flex", gap: "1rem" }}>
-          <label style={{ flex: 1 }}>
-            Date:
-            <input
-              type="date"
-              value={eventDate}
-              onChange={(e) => setEventDate(e.target.value)}
-              required
-            />
-          </label>
+      <br />
+      <button onClick={handleSubmit}>Create Event</button>
 
-          <label style={{ flex: 1 }}>
-            Time:
-            <input
-              type="time"
-              value={eventTime}
-              onChange={(e) => setEventTime(e.target.value)}
-              required
-            />
-          </label>
-        </div>
-
-        <label>
-          Details:
-          <textarea
-            rows={3}
-            value={details}
-            onChange={(e) => setDetails(e.target.value)}
-          />
-        </label>
-
+      {activeTab === "pantry" && (
         <div>
-          <p style={{ marginBottom: "0.5rem", fontWeight: "bold" }}>
-            Choose Dinner Type:
-          </p>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              gap: "1rem",
-              flexWrap: "wrap",
-            }}
-          >
-            {["PANTRY", "LEFTOVERS", "DINE_IN", "DINE_OUT"].map((type) => (
-              <button
-                key={type}
-                type="button"
-                onClick={() => setDinnerType(type)}
-                style={{
-                  padding: "0.5rem 1rem",
-                  border:
-                    dinnerType === type ? "2px solid black" : "1px solid gray",
-                  backgroundColor: dinnerType === type ? "#f0c040" : "#eee",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                }}
-              >
-                {type.replace("_", " ")}
-              </button>
-            ))}
-          </div>
+          <h4>Pantry Options:</h4>
+          {pantryOptions.map((item) => (
+            <label key={item.id} style={{ display: "block" }}>
+              <input
+                type="checkbox"
+                checked={selectedPantry.includes(item.id)}
+                onChange={() => handleToggle(item.id, "pantry")}
+              />
+              {item.name}
+            </label>
+          ))}
         </div>
+      )}
 
-        <button type="submit" style={{ padding: "0.75rem", marginTop: "1rem" }}>
-          Submit Dinner
-        </button>
-      </form>
+      {activeTab === "dine_in" && (
+        <div>
+          <h4>Dine In Options:</h4>
+          {dineInOptions.map((item) => (
+            <label key={item.id} style={{ display: "block" }}>
+              <input
+                type="checkbox"
+                checked={selectedDineIn.includes(item.id)}
+                onChange={() => handleToggle(item.id, "dine_in")}
+              />
+              {item.name}
+            </label>
+          ))}
+        </div>
+      )}
+
+      {activeTab === "dine_out" && (
+        <div>
+          <h4>Dine Out Options:</h4>
+          {dineOutOptions.map((item) => (
+            <label key={item.id} style={{ display: "block" }}>
+              <input
+                type="checkbox"
+                checked={selectedDineOut.includes(item.id)}
+                onChange={() => handleToggle(item.id, "dine_out")}
+              />
+              {item.name}
+            </label>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

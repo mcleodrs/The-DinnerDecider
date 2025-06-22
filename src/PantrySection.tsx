@@ -1,192 +1,226 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
+import { useAuth } from "./auth";
+import { useNavigate } from "react-router-dom";
 
-type Meal = {
+type PantryMeal = {
   id: string;
+  chef_id: string;
   name: string;
-  is_favorite: boolean;
+  favorite?: boolean;
   ingredients?: string;
-  process?: string;
-  secret?: string;
+  notes?: string;
+  secrets?: string;
 };
 
 export default function PantrySection() {
-  const [meals, setMeals] = useState<Meal[]>([]);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [meals, setMeals] = useState<PantryMeal[]>([]);
   const [newMealName, setNewMealName] = useState("");
-  const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
-  const [editing, setEditing] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editData, setEditData] = useState({
+    name: "",
+    ingredients: "",
+    notes: "",
+    secrets: "",
+    favorite: false,
+  });
 
   useEffect(() => {
     fetchMeals();
   }, []);
 
-  const fetchMeals = async () => {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
+  async function fetchMeals() {
     const { data, error } = await supabase
       .from("pantry_meals")
       .select("*")
-      .eq("chef_id", user?.id)
-      .order("created_at", { ascending: false });
+      .eq("chef_id", user.id)
+      .order("name", { ascending: true });
 
-    if (!error) setMeals(data || []);
-  };
+    if (!error && data) {
+      setMeals(data);
+    } else {
+      console.error("Fetch error:", error?.message);
+    }
+  }
 
-  const addMeal = async () => {
+  async function addMeal() {
     if (!newMealName.trim()) return;
 
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("pantry_meals")
-      .insert({ name: newMealName, chef_id: user?.id, is_favorite: false });
+      .insert([{ chef_id: user.id, name: newMealName }])
+      .select();
 
-    if (!error) {
+    if (!error && data) {
+      setMeals([...meals, data[0]]);
       setNewMealName("");
-      await fetchMeals();
     }
-  };
+  }
 
-  const updateMeal = async () => {
-    if (!selectedMeal) return;
+  function startEditing(meal: PantryMeal) {
+    setEditingId(meal.id);
+    setEditData({
+      name: meal.name,
+      ingredients: meal.ingredients || "",
+      notes: meal.notes || "",
+      secrets: meal.secrets || "",
+      favorite: meal.favorite || false,
+    });
+  }
+
+  async function saveEdit(id: string) {
+    const updatePayload = {
+      name: editData.name.trim(),
+      ingredients: editData.ingredients.trim() || null,
+      notes: editData.notes.trim() || null,
+      secrets: editData.secrets.trim() || null,
+      favorite: editData.favorite,
+    };
 
     const { error } = await supabase
       .from("pantry_meals")
-      .update({
-        name: selectedMeal.name,
-        is_favorite: selectedMeal.is_favorite,
-        ingredients: selectedMeal.ingredients,
-        process: selectedMeal.process,
-        secret: selectedMeal.secret,
-      })
-      .eq("id", selectedMeal.id);
+      .update(updatePayload)
+      .eq("id", id);
 
     if (!error) {
-      setEditing(false);
-      await fetchMeals();
+      setEditingId(null);
+      fetchMeals();
+    } else {
+      alert("Failed to save changes: " + error.message);
     }
-  };
+  }
 
-  const deleteMeal = async () => {
-    if (!selectedMeal) return;
-
-    const { error } = await supabase
-      .from("pantry_meals")
-      .delete()
-      .eq("id", selectedMeal.id);
-
+  async function deleteMeal(id: string) {
+    const { error } = await supabase.from("pantry_meals").delete().eq("id", id);
     if (!error) {
-      setSelectedMeal(null);
-      setEditing(false);
-      await fetchMeals();
+      setMeals(meals.filter((m) => m.id !== id));
     }
-  };
+  }
 
   return (
     <div className="profile-container">
       <h2>Pantry Meals</h2>
 
-      <div style={{ display: "flex", gap: "0.5rem", marginBottom: "1rem" }}>
+      <div style={{ marginBottom: "1rem", textAlign: "center" }}>
+        <button onClick={() => navigate("/create-event")}>
+          ➕ Create Event
+        </button>{" "}
+        <button onClick={() => alert("Show calendar view soon!")}>
+          📅 View Calendar
+        </button>
+      </div>
+
+      <div style={{ marginBottom: "1rem" }}>
         <input
           type="text"
           value={newMealName}
+          placeholder="Add Pantry Meal"
           onChange={(e) => setNewMealName(e.target.value)}
-          placeholder="New meal name"
         />
         <button onClick={addMeal}>Add Meal</button>
       </div>
 
-      {meals.length === 0 ? (
-        <p>No meals added yet.</p>
-      ) : (
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          {meals.map((meal) => (
-            <li
-              key={meal.id}
-              onClick={() => {
-                setSelectedMeal(meal);
-                setEditing(true);
-              }}
-              style={{
-                marginBottom: "0.5rem",
-                cursor: "pointer",
-                backgroundColor:
-                  selectedMeal?.id === meal.id ? "#f0f0f0" : "transparent",
-                padding: "0.5rem",
-                borderRadius: "8px",
-              }}
-            >
-              {meal.is_favorite ? "⭐ " : "🍽️ "}
-              {meal.name}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {editing && selectedMeal && (
-        <div style={{ marginTop: "2rem" }}>
-          <h3>Edit Meal: {selectedMeal.name}</h3>
-          <input
-            type="text"
-            value={selectedMeal.name}
-            onChange={(e) =>
-              setSelectedMeal({ ...selectedMeal, name: e.target.value })
-            }
-            placeholder="Meal Name"
-          />
-          <br />
-          <label>
-            <input
-              type="checkbox"
-              checked={selectedMeal.is_favorite}
-              onChange={(e) =>
-                setSelectedMeal({
-                  ...selectedMeal,
-                  is_favorite: e.target.checked,
-                })
-              }
-            />{" "}
-            Mark as Favorite
-          </label>
-          <br />
-          <textarea
-            placeholder="Ingredients"
-            value={selectedMeal.ingredients || ""}
-            onChange={(e) =>
-              setSelectedMeal({ ...selectedMeal, ingredients: e.target.value })
-            }
-            style={{ width: "100%", height: "60px", marginTop: "0.5rem" }}
-          />
-          <textarea
-            placeholder="Process (Optional)"
-            value={selectedMeal.process || ""}
-            onChange={(e) =>
-              setSelectedMeal({ ...selectedMeal, process: e.target.value })
-            }
-            style={{ width: "100%", height: "60px", marginTop: "0.5rem" }}
-          />
-          <textarea
-            placeholder="Secret (Optional)"
-            value={selectedMeal.secret || ""}
-            onChange={(e) =>
-              setSelectedMeal({ ...selectedMeal, secret: e.target.value })
-            }
-            style={{ width: "100%", height: "60px", marginTop: "0.5rem" }}
-          />
-          <br />
-          <button onClick={updateMeal}>💾 Save</button>{" "}
-          <button
-            onClick={deleteMeal}
-            style={{ backgroundColor: "#c00", color: "#fff" }}
-          >
-            🗑 Delete
-          </button>
+      {meals.map((meal) => (
+        <div
+          key={meal.id}
+          style={{
+            border: "1px solid #ccc",
+            borderRadius: "0.5rem",
+            padding: "1rem",
+            marginBottom: "0.5rem",
+            background: "#f9f9f9",
+            textAlign: "left",
+          }}
+        >
+          {editingId === meal.id ? (
+            <>
+              <input
+                type="text"
+                value={editData.name}
+                onChange={(e) =>
+                  setEditData({ ...editData, name: e.target.value })
+                }
+              />
+              <input
+                type="text"
+                value={editData.ingredients}
+                placeholder="Ingredients"
+                onChange={(e) =>
+                  setEditData({ ...editData, ingredients: e.target.value })
+                }
+                style={{ width: "100%", marginTop: "0.5rem" }}
+              />
+              <textarea
+                rows={2}
+                value={editData.notes}
+                placeholder="Notes"
+                onChange={(e) =>
+                  setEditData({ ...editData, notes: e.target.value })
+                }
+                style={{ width: "100%", marginTop: "0.5rem" }}
+              />
+              <textarea
+                rows={2}
+                value={editData.secrets}
+                placeholder="Secrets (optional)"
+                onChange={(e) =>
+                  setEditData({ ...editData, secrets: e.target.value })
+                }
+                style={{ width: "100%", marginTop: "0.5rem" }}
+              />
+              <div style={{ marginTop: "0.5rem" }}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={editData.favorite}
+                    onChange={(e) =>
+                      setEditData({ ...editData, favorite: e.target.checked })
+                    }
+                  />{" "}
+                  Mark as Favorite
+                </label>
+              </div>
+              <div style={{ marginTop: "0.5rem" }}>
+                <button onClick={() => saveEdit(meal.id)}>Save</button>{" "}
+                <button onClick={() => setEditingId(null)}>Cancel</button>{" "}
+                <button onClick={() => deleteMeal(meal.id)}>Delete</button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h4
+                onClick={() => startEditing(meal)}
+                style={{
+                  cursor: "pointer",
+                  marginBottom: "0.25rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
+              >
+                <span style={{ fontSize: "1.25rem" }}>
+                  {meal.favorite ? "★" : ""}
+                </span>
+                <span>{meal.name}</span>
+              </h4>
+              {meal.ingredients && (
+                <p>
+                  <strong>Ingredients:</strong> {meal.ingredients}
+                </p>
+              )}
+              {/*{meal.notes && (
+                <p style={{ fontStyle: "italic" }}>
+                  {meal.notes}You can delete
+             </p> 
+            
+              )}*/}
+              {/* Secrets could be displayed conditionally in future */}
+            </>
+          )}
         </div>
-      )}
+      ))}
     </div>
   );
 }
