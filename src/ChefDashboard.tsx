@@ -77,22 +77,19 @@ export default function ChefDashboard() {
           🍔 Dine Out
         </button>
       </div>
-
-      <div>
-        {activeTab === "pantry" && <PantrySection />}
-        {activeTab === "dine_in" && <DineInSection />}
-        {activeTab === "dine_out" && <DineOutSection />}
-      </div>
-
       <div style={{ marginTop: "2rem" }}>
         <button onClick={() => navigate("/create-event")}>
           ➕ Create Event
         </button>
-        <br />
-        <br />
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <button onClick={() => alert("Show calendar view soon!")}>
           📅 View Calendar
         </button>
+      </div>
+      <div>
+        {activeTab === "pantry" && <PantrySection />}
+        {activeTab === "dine_in" && <DineInSection />}
+        {activeTab === "dine_out" && <DineOutSection />}
       </div>
     </main>
   );

@@ -1,111 +1,213 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
+import { useAuth } from "./auth";
+import { useNavigate } from "react-router-dom";
 
-type Restaurant = {
+type DineOutOption = {
   id: string;
   chef_id: string;
   name: string;
-  location_url: string;
-  created_at: string;
+  url?: string;
+  notes?: string;
+  favorite?: boolean;
 };
 
 export default function DineOutSection() {
-  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
-  const [name, setName] = useState("");
-  const [locationUrl, setLocationUrl] = useState("");
-
-  const chefId = "00000000-0000-0000-0000-000000000001"; // Replace later with dynamic user
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [options, setOptions] = useState<DineOutOption[]>([]);
+  const [newOptionName, setNewOptionName] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editData, setEditData] = useState({
+    name: "",
+    url: "",
+    notes: "",
+    favorite: false,
+  });
 
   useEffect(() => {
-    fetchRestaurants();
+    fetchOptions();
   }, []);
 
-  async function fetchRestaurants() {
+  async function fetchOptions() {
     const { data, error } = await supabase
       .from("dine_out_restaurants")
       .select("*")
-      .eq("chef_id", chefId)
-      .order("created_at", { ascending: false });
+      .eq("chef_id", user.id)
+      .order("name", { ascending: true });
 
-    if (error) console.error("Error fetching restaurants:", error);
-    else setRestaurants(data || []);
-  }
-
-  async function addRestaurant() {
-    if (!name.trim()) return;
-
-    const { error } = await supabase.from("dine_out_restaurants").insert([
-      {
-        chef_id: chefId,
-        name: name.trim(),
-        location_url: locationUrl.trim(),
-      },
-    ]);
-
-    if (!error) {
-      setName("");
-      setLocationUrl("");
-      fetchRestaurants();
+    if (!error && data) {
+      setOptions(data);
     } else {
-      console.error("Error adding restaurant:", error);
+      console.error("Fetch error:", error?.message);
     }
   }
 
-  async function deleteRestaurant(id: string) {
+  async function addOption() {
+    if (!newOptionName.trim()) return;
+
+    const { data, error } = await supabase
+      .from("dine_out_restaurants")
+      .insert([{ chef_id: user.id, name: newOptionName }])
+      .select();
+
+    if (!error && data) {
+      setOptions([...options, data[0]]);
+      setNewOptionName("");
+    }
+  }
+
+  function startEditing(option: DineOutOption) {
+    setEditingId(option.id);
+    setEditData({
+      name: option.name,
+      url: option.url || "",
+      notes: option.notes || "",
+      favorite: option.favorite || false,
+    });
+  }
+
+  async function saveEdit(id: string) {
+    const updatePayload = {
+      name: editData.name.trim(),
+      url: editData.url.trim() || null,
+      notes: editData.notes.trim() || null,
+      favorite: editData.favorite,
+    };
+
+    const { error } = await supabase
+      .from("dine_out_restaurants")
+      .update(updatePayload)
+      .eq("id", id);
+
+    if (!error) {
+      setEditingId(null);
+      fetchOptions();
+    } else {
+      alert("Failed to save changes: " + error.message);
+    }
+  }
+
+  async function deleteOption(id: string) {
     const { error } = await supabase
       .from("dine_out_restaurants")
       .delete()
       .eq("id", id);
-    if (!error) fetchRestaurants();
+
+    if (!error) {
+      setOptions(options.filter((opt) => opt.id !== id));
+    }
   }
 
   return (
-    <div>
-      <h2>Dine Out Locations</h2>
+    <div className="profile-container">
+      <h2>Dine Out Options</h2>
+
+      <div style={{ marginBottom: "1rem", textAlign: "center" }}>
+        <button onClick={() => navigate("/create-event")}>
+          ➕ Create Event
+        </button>{" "}
+        <button onClick={() => alert("Show calendar view soon!")}>
+          📅 View Calendar
+        </button>
+      </div>
 
       <div style={{ marginBottom: "1rem" }}>
         <input
           type="text"
-          placeholder="Restaurant name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+          value={newOptionName}
+          placeholder="Add Dine Out Option"
+          onChange={(e) => setNewOptionName(e.target.value)}
         />
-        <input
-          type="text"
-          placeholder="Optional Google Maps URL"
-          value={locationUrl}
-          onChange={(e) => setLocationUrl(e.target.value)}
-          style={{ marginLeft: "0.5rem" }}
-        />
-        <button onClick={addRestaurant} style={{ marginLeft: "0.5rem" }}>
-          ➕ Add
-        </button>
+        <button onClick={addOption}>Add Option</button>
       </div>
 
-      {restaurants.length === 0 ? (
-        <p>No restaurants saved.</p>
-      ) : (
-        <ul style={{ listStyle: "none", paddingLeft: 0 }}>
-          {restaurants.map((r) => (
-            <li key={r.id} style={{ marginBottom: "0.5rem" }}>
-              <strong>{r.name}</strong>{" "}
-              {r.location_url && (
-                <a href={r.location_url} target="_blank" rel="noreferrer">
-                  📍 Map
-                </a>
-              )}
-              <button
-                onClick={() => deleteRestaurant(r.id)}
-                style={{ marginLeft: "0.5rem" }}
+      {options.map((option) => (
+        <div
+          key={option.id}
+          style={{
+            border: "1px solid #ccc",
+            borderRadius: "0.5rem",
+            padding: "1rem",
+            marginBottom: "0.5rem",
+            background: "#f9f9f9",
+            textAlign: "left",
+          }}
+        >
+          {editingId === option.id ? (
+            <>
+              <input
+                type="text"
+                value={editData.name}
+                onChange={(e) =>
+                  setEditData({ ...editData, name: e.target.value })
+                }
+              />
+              <input
+                type="text"
+                value={editData.url}
+                placeholder="Optional URL"
+                onChange={(e) =>
+                  setEditData({ ...editData, url: e.target.value })
+                }
+                style={{ width: "100%", marginTop: "0.5rem" }}
+              />
+              <textarea
+                rows={2}
+                value={editData.notes}
+                onChange={(e) =>
+                  setEditData({ ...editData, notes: e.target.value })
+                }
+                placeholder="Notes (optional)"
+                style={{ width: "100%", marginTop: "0.5rem" }}
+              />
+              <div style={{ marginTop: "0.5rem" }}>
+                <label>
+                  <input
+                    type="checkbox"
+                    checked={editData.favorite}
+                    onChange={(e) =>
+                      setEditData({
+                        ...editData,
+                        favorite: e.target.checked,
+                      })
+                    }
+                  />{" "}
+                  Mark as Favorite
+                </label>
+              </div>
+              <div style={{ marginTop: "0.5rem" }}>
+                <button onClick={() => saveEdit(option.id)}>Save</button>{" "}
+                <button onClick={() => setEditingId(null)}>Cancel</button>{" "}
+                <button onClick={() => deleteOption(option.id)}>Delete</button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h4
+                onClick={() => startEditing(option)}
+                style={{
+                  cursor: "pointer",
+                  marginBottom: "0.25rem",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "0.5rem",
+                }}
               >
-                ❌ Delete
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+                <span style={{ fontSize: "1.25rem" }}>
+                  {option.favorite ? "★" : ""}
+                </span>
+                <span>{option.name}</span>
+              </h4>
+              {option.notes && (
+                <p style={{ fontStyle: "italic", marginBottom: "0.5rem" }}>
+                  {option.notes}
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      ))}
     </div>
   );
 }

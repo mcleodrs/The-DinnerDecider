@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
 import { useAuth } from "./auth";
+import { useNavigate } from "react-router-dom";
 
 type DineInOption = {
   id: string;
@@ -8,20 +9,21 @@ type DineInOption = {
   name: string;
   url?: string;
   notes?: string;
-  is_favorite?: boolean;
+  favorite?: boolean;
 };
 
 export default function DineInSection() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [options, setOptions] = useState<DineInOption[]>([]);
   const [newOptionName, setNewOptionName] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editData, setEditData] = useState<{
-    name: string;
-    url: string;
-    notes: string;
-    is_favorite: boolean;
-  }>({ name: "", url: "", notes: "", is_favorite: false });
+  const [editData, setEditData] = useState({
+    name: "",
+    url: "",
+    notes: "",
+    favorite: false,
+  });
 
   useEffect(() => {
     fetchOptions();
@@ -36,6 +38,8 @@ export default function DineInSection() {
 
     if (!error && data) {
       setOptions(data);
+    } else {
+      console.error("Fetch error:", error?.message);
     }
   }
 
@@ -48,10 +52,8 @@ export default function DineInSection() {
       .select();
 
     if (!error && data) {
-      setOptions((prev) => [...prev, data[0]]);
+      setOptions([...options, data[0]]);
       setNewOptionName("");
-    } else {
-      console.error("Add option failed:", error?.message);
     }
   }
 
@@ -61,31 +63,40 @@ export default function DineInSection() {
       name: option.name,
       url: option.url || "",
       notes: option.notes || "",
-      is_favorite: option.is_favorite || false,
+      favorite: option.favorite || false,
     });
   }
 
   async function saveEdit(id: string) {
+    const updatePayload = {
+      name: editData.name.trim(),
+      url: editData.url.trim() || null,
+      notes: editData.notes.trim() || null,
+      favorite: editData.favorite,
+    };
+
     const { error } = await supabase
       .from("dine_in_options")
-      .update(editData)
+      .update(updatePayload)
       .eq("id", id);
 
     if (!error) {
-      setOptions((prevOptions) =>
-        prevOptions.map((opt) =>
-          opt.id === id ? { ...opt, ...editData } : opt
-        )
-      );
       setEditingId(null);
+      fetchOptions();
     } else {
-      console.error("Failed to save edit:", error.message);
+      alert("Failed to save changes: " + error.message);
     }
   }
 
   async function deleteOption(id: string) {
-    await supabase.from("dine_in_options").delete().eq("id", id);
-    setOptions((prev) => prev.filter((opt) => opt.id !== id));
+    const { error } = await supabase
+      .from("dine_in_options")
+      .delete()
+      .eq("id", id);
+
+    if (!error) {
+      setOptions(options.filter((opt) => opt.id !== id));
+    }
   }
 
   return (
@@ -144,11 +155,11 @@ export default function DineInSection() {
                 <label>
                   <input
                     type="checkbox"
-                    checked={editData.is_favorite}
+                    checked={editData.favorite}
                     onChange={(e) =>
                       setEditData({
                         ...editData,
-                        is_favorite: e.target.checked,
+                        favorite: e.target.checked,
                       })
                     }
                   />{" "}
@@ -174,7 +185,7 @@ export default function DineInSection() {
                 }}
               >
                 <span style={{ fontSize: "1.25rem" }}>
-                  {option.is_favorite ? "★" : ""}
+                  {option.favorite ? "★" : ""}
                 </span>
                 <span>{option.name}</span>
               </h4>
