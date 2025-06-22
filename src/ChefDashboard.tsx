@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 import PantrySection from "./PantrySection";
 import DineInSection from "./DineInSection";
 import DineOutSection from "./DineOutSection";
-import { useNavigate } from "react-router-dom";
 
 type Profile = {
   full_name: string;
@@ -15,25 +15,45 @@ export default function ChefDashboard() {
     "pantry"
   );
   const [profile, setProfile] = useState<Profile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+
   useEffect(() => {
-    async function loadProfile() {
+    const loadProfile = async () => {
       const {
         data: { user },
+        error: authError,
       } = await supabase.auth.getUser();
-      if (!user) return;
 
-      const { data, error } = await supabase
+      if (!user || authError) {
+        console.error("Not authenticated or error:", authError);
+        setError("You must be logged in to access the dashboard.");
+        navigate("/login");
+        return;
+      }
+
+      const { data, error: dbError } = await supabase
         .from("users")
         .select("full_name, role")
         .eq("id", user.id)
         .single();
 
-      if (!error) setProfile(data);
-    }
+      if (dbError) {
+        console.error("Error loading profile:", dbError);
+        setError("Failed to load profile.");
+      } else {
+        setProfile(data);
+      }
+
+      setLoading(false);
+    };
 
     loadProfile();
-  }, []);
+  }, [navigate]);
+
+  if (loading) return <p style={{ padding: "2rem" }}>Loading dashboard...</p>;
+  if (error) return <p style={{ color: "red", padding: "2rem" }}>{error}</p>;
 
   return (
     <main style={{ padding: "2rem" }}>
@@ -84,7 +104,7 @@ export default function ChefDashboard() {
         </button>
         <br />
         <br />
-        <button onClick={() => alert("Show calendar view soon!")}>
+        <button onClick={() => alert("📅 Calendar view coming soon!")}>
           📅 View Calendar
         </button>
       </div>
