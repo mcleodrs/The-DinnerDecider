@@ -19,7 +19,7 @@ body {
    Theme Backgrounds
 =========================== */
 .red {
-  background-image: url("/project/workspace/public/AppBackGround.png");
+  background-image: url("public/AppBackGround.png");
   background-size: cover;
   background-repeat: repeat;
   background-attachment: fixed;
