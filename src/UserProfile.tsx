@@ -5,9 +5,7 @@ import { supabase } from "./supabaseClient";
 export default function UserProfile() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [fullName, setFullName] = useState("");
-  const [uiTheme, setUiTheme] = useState("red");
-  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -18,20 +16,26 @@ export default function UserProfile() {
       } = await supabase.auth.getUser();
 
       if (userError || !user) {
+        console.error("User fetch error", userError);
+        setError("You are not logged in.");
+        setLoading(false);
         navigate("/login");
         return;
       }
 
+      console.log("User ID:", user.id);
+
       const { data, error } = await supabase
         .from("users")
-        .select("id, full_name, email, role, uitheme_pref")
+        .select("full_name, email, role")
         .eq("id", user.id)
         .single();
 
-      if (!error && data) {
+      if (error) {
+        console.error("Supabase query error", error);
+        setError("Could not load user profile.");
+      } else {
         setProfile(data);
-        setFullName(data.full_name || "");
-        setUiTheme(data.uitheme_pref || "red");
       }
 
       setLoading(false);
@@ -40,32 +44,8 @@ export default function UserProfile() {
     fetchProfile();
   }, [navigate]);
 
-  const handleUpdate = async () => {
-    if (!profile) return;
-
-    const { error } = await supabase
-      .from("users")
-      .update({ full_name: fullName, uitheme_pref: uiTheme })
-      .eq("id", profile.id);
-
-    setMessage(error ? "Update failed." : "Profile updated.");
-  };
-
-  const handleSendVerification = async () => {
-    const { error } = await supabase.auth.resend({
-      type: "signup",
-      email: profile.email,
-    });
-
-    setMessage(error ? "Failed to resend email." : "Verification email sent.");
-  };
-
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate("/login");
-  };
-
   if (loading) return <p>Loading profile...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
 
   return (
     <div style={{ padding: "2rem" }}>
@@ -74,40 +54,11 @@ export default function UserProfile() {
         <strong>Email:</strong> {profile.email}
       </p>
       <p>
+        <strong>Full Name:</strong> {profile.full_name}
+      </p>
+      <p>
         <strong>Role:</strong> {profile.role}
       </p>
-      <div>
-        <label>
-          <strong>Full Name:</strong>
-          <br />
-          <input
-            type="text"
-            value={fullName}
-            onChange={(e) => setFullName(e.target.value)}
-          />
-        </label>
-      </div>
-      <div>
-        <label>
-          <strong>Theme Preference:</strong>
-          <br />
-          <select value={uiTheme} onChange={(e) => setUiTheme(e.target.value)}>
-            <option value="red">Red</option>
-            <option value="blue">Blue</option>
-            <option value="dark">Dark</option>
-            <option value="light">Light</option>
-          </select>
-        </label>
-      </div>
-      <br />
-      <button onClick={handleUpdate}>Save Profile</button>
-      <button onClick={handleSendVerification} style={{ marginLeft: "1rem" }}>
-        Resend Verification Email
-      </button>
-      <br />
-      <br />
-      <button onClick={handleSignOut}>Sign Out</button>
-      {message && <p>{message}</p>}
     </div>
   );
 }
