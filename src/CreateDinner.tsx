@@ -10,7 +10,9 @@ type Option = {
 export default function CreateDinner() {
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState<"pantry" | "dine_in" | "dine_out">("pantry");
+  const [activeTab, setActiveTab] = useState<"pantry" | "dine_in" | "dine_out">(
+    "pantry"
+  );
 
   const [pantryOptions, setPantryOptions] = useState<Option[]>([]);
   const [dineInOptions, setDineInOptions] = useState<Option[]>([]);
@@ -28,11 +30,16 @@ export default function CreateDinner() {
 
   useEffect(() => {
     const loadOptions = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       const fetchOptions = async (table: string) => {
-        const { data } = await supabase.from(table).select("id, name").eq("chef_id", user.id);
+        const { data } = await supabase
+          .from(table)
+          .select("id, name")
+          .eq("chef_id", user.id);
         return data || [];
       };
 
@@ -44,20 +51,29 @@ export default function CreateDinner() {
     loadOptions();
   }, []);
 
-  const toggleSelection = (id: string, type: "pantry" | "dine_in" | "dine_out") => {
-    const mapping = {
-      pantry: [selectedPantry, setSelectedPantry],
-      dine_in: [selectedDineIn, setSelectedDineIn],
-      dine_out: [selectedDineOut, setSelectedDineOut],
-    };
-
-    const [current, set] = mapping[type];
-    const updated = current.includes(id) ? current.filter((x) => x !== id) : [...current, id];
-    set(updated);
+  const toggleSelection = (
+    id: string,
+    type: "pantry" | "dine_in" | "dine_out"
+  ) => {
+    if (type === "pantry") {
+      setSelectedPantry((prev) =>
+        prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      );
+    } else if (type === "dine_in") {
+      setSelectedDineIn((prev) =>
+        prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      );
+    } else {
+      setSelectedDineOut((prev) =>
+        prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+      );
+    }
   };
 
   const createEvent = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) return;
 
     const { data, error } = await supabase
@@ -86,20 +102,30 @@ export default function CreateDinner() {
 
   const renderSelectedOptions = () => {
     const names = [
-      ...selectedPantry.map(id => pantryOptions.find(opt => opt.id === id)?.name),
-      ...selectedDineIn.map(id => dineInOptions.find(opt => opt.id === id)?.name),
-      ...selectedDineOut.map(id => dineOutOptions.find(opt => opt.id === id)?.name),
+      ...selectedPantry.map(
+        (id) => pantryOptions.find((opt) => opt.id === id)?.name
+      ),
+      ...selectedDineIn.map(
+        (id) => dineInOptions.find((opt) => opt.id === id)?.name
+      ),
+      ...selectedDineOut.map(
+        (id) => dineOutOptions.find((opt) => opt.id === id)?.name
+      ),
     ].filter(Boolean);
 
     return names.length > 0 ? (
       <div style={{ marginBottom: "1rem" }}>
         <h4>Selected Event Options:</h4>
-        <ul>{names.map((name, i) => <li key={i}>{name}</li>)}</ul>
+        <ul>
+          {names.map((name, i) => (
+            <li key={i}>{name}</li>
+          ))}
+        </ul>
       </div>
     ) : null;
   };
 
-  const renderCheckboxList = (
+  const renderToggleButtons = (
     options: Option[],
     selected: string[],
     type: "pantry" | "dine_in" | "dine_out"
@@ -107,7 +133,7 @@ export default function CreateDinner() {
     const midpoint = Math.ceil(options.length / 2);
     const col1 = options.slice(0, midpoint);
     const col2 = options.slice(midpoint);
-  
+
     const renderColumn = (items: Option[]) => (
       <div style={{ flex: 1 }}>
         {items.map((opt) => {
@@ -136,22 +162,14 @@ export default function CreateDinner() {
         })}
       </div>
     );
-    /* Which One Do We Want To Use - you are getting close keep going -night scott
-<input
-  type="checkbox"
-  id={`option-${opt.id}`}
-  checked={selected.includes(opt.id)}
-  onChange={() => toggleSelection(opt.id, type)}
-/>
-<label htmlFor={`option-${opt.id}`}>{opt.name}</label>
-*/
-return (
-  <div style={{ display: "flex", gap: "1rem" }}>
-    {renderColumn(col1)}
-    {renderColumn(col2)}
-  </div>
-);
-};
+
+    return (
+      <div style={{ display: "flex", gap: "1rem" }}>
+        {renderColumn(col1)}
+        {renderColumn(col2)}
+      </div>
+    );
+  };
 
   return (
     <div className="profile-container">
@@ -164,16 +182,31 @@ return (
       <input value={location} onChange={(e) => setLocation(e.target.value)} />
 
       <label>Date:</label>
-      <input type="date" value={eventDate} onChange={(e) => setEventDate(e.target.value)} />
+      <input
+        type="date"
+        value={eventDate}
+        onChange={(e) => setEventDate(e.target.value)}
+      />
 
       <label>Time:</label>
-      <input type="time" value={eventTime} onChange={(e) => setEventTime(e.target.value)} />
+      <input
+        type="time"
+        value={eventTime}
+        onChange={(e) => setEventTime(e.target.value)}
+      />
 
       <label>Details:</label>
       <textarea value={details} onChange={(e) => setDetails(e.target.value)} />
 
       <h3>Choose Event Options:</h3>
-      <div style={{ display: "flex", gap: "1rem", justifyContent: "center", marginBottom: "1rem" }}>
+      <div
+        style={{
+          display: "flex",
+          gap: "1rem",
+          justifyContent: "center",
+          marginBottom: "1rem",
+        }}
+      >
         <button onClick={() => setActiveTab("pantry")}>🧺 Pantry</button>
         <button onClick={() => setActiveTab("dine_in")}>🏠 Dine In</button>
         <button onClick={() => setActiveTab("dine_out")}>🍔 Dine Out</button>
@@ -184,19 +217,19 @@ return (
       {activeTab === "pantry" && (
         <>
           <h4>Pantry Options:</h4>
-          {renderCheckboxList(pantryOptions, selectedPantry, "pantry")}
+          {renderToggleButtons(pantryOptions, selectedPantry, "pantry")}
         </>
       )}
       {activeTab === "dine_in" && (
         <>
           <h4>Dine In Options:</h4>
-          {renderCheckboxList(dineInOptions, selectedDineIn, "dine_in")}
+          {renderToggleButtons(dineInOptions, selectedDineIn, "dine_in")}
         </>
       )}
       {activeTab === "dine_out" && (
         <>
           <h4>Dine Out Options:</h4>
-          {renderCheckboxList(dineOutOptions, selectedDineOut, "dine_out")}
+          {renderToggleButtons(dineOutOptions, selectedDineOut, "dine_out")}
         </>
       )}
 
