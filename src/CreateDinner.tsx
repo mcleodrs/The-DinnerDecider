@@ -7,12 +7,12 @@ type Option = {
   name: string;
 };
 
+type OptionType = "pantry" | "dine_in" | "dine_out";
+
 export default function CreateDinner() {
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState<"pantry" | "dine_in" | "dine_out">(
-    "pantry"
-  );
+  const [activeTab, setActiveTab] = useState<OptionType>("pantry");
 
   const [pantryOptions, setPantryOptions] = useState<Option[]>([]);
   const [dineInOptions, setDineInOptions] = useState<Option[]>([]);
@@ -51,23 +51,21 @@ export default function CreateDinner() {
     loadOptions();
   }, []);
 
-  const toggleSelection = (
-    id: string,
-    type: "pantry" | "dine_in" | "dine_out"
-  ) => {
-    if (type === "pantry") {
-      setSelectedPantry((prev) =>
-        prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-      );
-    } else if (type === "dine_in") {
-      setSelectedDineIn((prev) =>
-        prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-      );
-    } else {
-      setSelectedDineOut((prev) =>
-        prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-      );
-    }
+  const toggleSelection = (id: string, type: OptionType) => {
+    const mapping: Record<
+      OptionType,
+      [string[], React.Dispatch<React.SetStateAction<string[]>>]
+    > = {
+      pantry: [selectedPantry, setSelectedPantry],
+      dine_in: [selectedDineIn, setSelectedDineIn],
+      dine_out: [selectedDineOut, setSelectedDineOut],
+    };
+
+    const [current, set] = mapping[type];
+    const updated = current.includes(id)
+      ? current.filter((x) => x !== id)
+      : [...current, id];
+    set(updated);
   };
 
   const createEvent = async () => {
@@ -85,9 +83,6 @@ export default function CreateDinner() {
         event_date: eventDate,
         event_time: eventTime,
         details,
-        pantry_meal_ids: selectedPantry,
-        dine_in_option_ids: selectedDineIn,
-        dine_out_option_ids: selectedDineOut,
       })
       .select()
       .single();
@@ -97,7 +92,36 @@ export default function CreateDinner() {
       return;
     }
 
-    navigate(`/invite-guests?event_id=${data.id}`);
+    const eventId = data.id;
+
+    const allOptions = [
+      ...selectedPantry.map((id) => ({
+        event_id: eventId,
+        option_id: id,
+        type: "pantry",
+      })),
+      ...selectedDineIn.map((id) => ({
+        event_id: eventId,
+        option_id: id,
+        type: "dine_in",
+      })),
+      ...selectedDineOut.map((id) => ({
+        event_id: eventId,
+        option_id: id,
+        type: "dine_out",
+      })),
+    ];
+
+    const { error: optionError } = await supabase
+      .from("event_dinner_options")
+      .insert(allOptions);
+
+    if (optionError) {
+      alert("Event created but options failed to save.");
+      return;
+    }
+
+    navigate(`/invite-diners?event_id=${eventId}`);
   };
 
   const renderSelectedOptions = () => {
@@ -125,10 +149,10 @@ export default function CreateDinner() {
     ) : null;
   };
 
-  const renderToggleButtons = (
+  const renderOptionGrid = (
     options: Option[],
     selected: string[],
-    type: "pantry" | "dine_in" | "dine_out"
+    type: OptionType
   ) => {
     const midpoint = Math.ceil(options.length / 2);
     const col1 = options.slice(0, midpoint);
@@ -217,19 +241,19 @@ export default function CreateDinner() {
       {activeTab === "pantry" && (
         <>
           <h4>Pantry Options:</h4>
-          {renderToggleButtons(pantryOptions, selectedPantry, "pantry")}
+          {renderOptionGrid(pantryOptions, selectedPantry, "pantry")}
         </>
       )}
       {activeTab === "dine_in" && (
         <>
           <h4>Dine In Options:</h4>
-          {renderToggleButtons(dineInOptions, selectedDineIn, "dine_in")}
+          {renderOptionGrid(dineInOptions, selectedDineIn, "dine_in")}
         </>
       )}
       {activeTab === "dine_out" && (
         <>
           <h4>Dine Out Options:</h4>
-          {renderToggleButtons(dineOutOptions, selectedDineOut, "dine_out")}
+          {renderOptionGrid(dineOutOptions, selectedDineOut, "dine_out")}
         </>
       )}
 

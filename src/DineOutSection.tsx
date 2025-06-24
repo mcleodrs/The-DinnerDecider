@@ -102,16 +102,6 @@ export default function DineOutSection() {
   return (
     <div className="profile-container">
       <h2>Dine Out Options</h2>
-
-      <div style={{ marginBottom: "1rem", textAlign: "center" }}>
-        <button onClick={() => navigate("/create-event")}>
-          ➕ Create Event
-        </button>{" "}
-        <button onClick={() => alert("Show calendar view soon!")}>
-          📅 View Calendar
-        </button>
-      </div>
-
       <div style={{ marginBottom: "1rem" }}>
         <input
           type="text"

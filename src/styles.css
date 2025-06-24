@@ -1,10 +1,14 @@
 /* ===========================
    Global Styles
 =========================== */
+
 body {
   margin: 0;
   font-family: "Segoe UI", sans-serif;
-  background-color: #fff;
+  background-image: url("/public/AppBackGround.png");
+  background-size: cover;
+  background-repeat: repeat;
+  background-attachment: fixed;
 }
 
 /* ===========================

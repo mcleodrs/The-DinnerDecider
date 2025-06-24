@@ -103,14 +103,7 @@ export default function PantrySection() {
     <div className="profile-container">
       <h2>Pantry Meals</h2>
 
-      <div style={{ marginBottom: "1rem", textAlign: "center" }}>
-        <button onClick={() => navigate("/create-event")}>
-          ➕ Create Event
-        </button>{" "}
-        <button onClick={() => alert("Show calendar view soon!")}>
-          📅 View Calendar
-        </button>
-      </div>
+      <div style={{ marginBottom: "1rem", textAlign: "center" }}></div>
 
       <div style={{ marginBottom: "1rem" }}>
         <input
@@ -128,8 +121,8 @@ export default function PantrySection() {
           style={{
             border: "1px solid #ccc",
             borderRadius: "0.5rem",
-            padding: "1rem",
-            marginBottom: "0.5rem",
+            padding: ".25rem",
+            marginBottom: "0.125rem",
             background: "#f9f9f9",
             textAlign: "left",
           }}
@@ -172,6 +165,7 @@ export default function PantrySection() {
               />
               <div style={{ marginTop: "0.5rem" }}>
                 <label>
+                  Mark as Favorite
                   <input
                     type="checkbox"
                     checked={editData.favorite}
@@ -179,10 +173,9 @@ export default function PantrySection() {
                       setEditData({ ...editData, favorite: e.target.checked })
                     }
                   />{" "}
-                  Mark as Favorite
                 </label>
               </div>
-              <div style={{ marginTop: "0.5rem" }}>
+              <div style={{ marginTop: "0.25rem" }}>
                 <button onClick={() => saveEdit(meal.id)}>Save</button>{" "}
                 <button onClick={() => setEditingId(null)}>Cancel</button>{" "}
                 <button onClick={() => deleteMeal(meal.id)}>Delete</button>

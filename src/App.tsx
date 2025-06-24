@@ -8,6 +8,7 @@ import UserProfile from "./UserProfile";
 import "./styles.css";
 import CreateDinner from "./CreateDinner";
 import NavBar from "./NavBar"; // add at top
+import InviteDiners from "./InviteDiners";
 
 export default function App() {
   const [themeClass, setThemeClass] = useState("red");
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="/dashboard" element={<ChefDashboard />} />
         <Route path="/user" element={<UserProfile />} />
         <Route path="/create-event" element={<CreateDinner />} />
+        <Route path="/invite-diners" element={<InviteDiners />} />
       </Routes>
     </div>
   );

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 
-export default function InviteGuests() {
+export default function InviteDiners() {
   const location = useLocation();
   const eventId = new URLSearchParams(location.search).get("event_id");
 
@@ -62,7 +62,7 @@ export default function InviteGuests() {
 
   return (
     <div className="profile-container">
-      <h1>Invite Guests</h1>
+      <h1>Invite Diners</h1>
       {emails.map((email, index) => (
         <div key={index} style={{ marginBottom: "0.5rem" }}>
           <input

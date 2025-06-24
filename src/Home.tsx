@@ -1,20 +1,18 @@
 import { Link } from "react-router-dom";
-import Login from "./Login";
+import "./styles.css";
 
 export default function Home() {
   return (
-    <div style={{ padding: "2rem" }}>
-      <h1>Welcome to The What's for Dinner App</h1>
-      <h3>
-        Brought to you by
-        <br />
-        The Dinner Decider
-      </h3>
-      <p>Please login:</p>
-      <Link to="/Login">Login</Link>
-      <br />
-      <br />
-      <Link to="/Dashboard">Go to Chef Dashboard</Link>
+    <div className="profile-container">
+      <h1>🍽️ Welcome to The Dinner Decider</h1>
+      <p style={{ fontSize: "1.1rem", marginBottom: "1.5rem" }}>
+        Planning dinner just got easier. Create events, vote on meals, and keep
+        the whole family in sync — all in one place.
+      </p>
+
+      <Link to="/login">
+        <button className="action-button">🔐 Log In to Get Started</button>
+      </Link>
     </div>
   );
 }
