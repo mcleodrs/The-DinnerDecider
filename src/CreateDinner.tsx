@@ -235,7 +235,8 @@ export default function CreateDinner() {
         <button onClick={() => setActiveTab("dine_in")}>🏠 Dine In</button>
         <button onClick={() => setActiveTab("dine_out")}>🍔 Dine Out</button>
       </div>
-
+      <br />
+      <button onClick={createEvent}>Create Event & Invite Guests</button>
       {renderSelectedOptions()}
 
       {activeTab === "pantry" && (
@@ -256,9 +257,6 @@ export default function CreateDinner() {
           {renderOptionGrid(dineOutOptions, selectedDineOut, "dine_out")}
         </>
       )}
-
-      <br />
-      <button onClick={createEvent}>Create Event & Invite Guests</button>
     </div>
   );
 }
