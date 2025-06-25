@@ -7,6 +7,8 @@ export default function InviteDiners() {
   const eventId = new URLSearchParams(location.search).get("event_id");
 
   const [emails, setEmails] = useState<string[]>([""]);
+  const [pastDiners, setPastDiners] = useState<string[]>([]);
+  const [selectedPast, setSelectedPast] = useState<string[]>([]);
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -26,14 +28,24 @@ export default function InviteDiners() {
     setEmails(updated);
   };
 
+  const togglePastDiner = (email: string) => {
+    setSelectedPast((prev) =>
+      prev.includes(email) ? prev.filter((e) => e !== email) : [...prev, email]
+    );
+  };
+
   const inviteGuests = async () => {
     if (!eventId) {
       setMessage("Invalid event. Please try again.");
       return;
     }
 
-    const validEmails = emails.filter((email) => email.trim() !== "");
-    if (validEmails.length === 0) {
+    const allEmails = [
+      ...emails.filter((email) => email.trim() !== ""),
+      ...selectedPast,
+    ];
+
+    if (allEmails.length === 0) {
       setMessage("Please enter at least one valid email.");
       return;
     }
@@ -41,7 +53,7 @@ export default function InviteDiners() {
     setSending(true);
     setMessage("");
 
-    const insertData = validEmails.map((email) => ({
+    const insertData = allEmails.map((email) => ({
       event_id: eventId,
       guest_email: email.trim(),
     }));
@@ -60,9 +72,32 @@ export default function InviteDiners() {
     setSending(false);
   };
 
+  useEffect(() => {
+    const fetchPastDiners = async () => {
+      const { data, error } = await supabase
+        .from("event_participants")
+        .select("guest_email");
+
+      if (error) {
+        console.error("Failed to load past diners:", error);
+        return;
+      }
+
+      const emails = (data || [])
+        .map((entry) => entry.guest_email)
+        .filter((email): email is string => Boolean(email));
+
+      const uniqueEmails = Array.from(new Set(emails));
+      setPastDiners(uniqueEmails);
+    };
+
+    fetchPastDiners();
+  }, []);
+
   return (
     <div className="profile-container">
       <h1>Invite Diners</h1>
+
       {emails.map((email, index) => (
         <div key={index} style={{ marginBottom: "0.5rem" }}>
           <input
@@ -79,7 +114,26 @@ export default function InviteDiners() {
       ))}
 
       <button onClick={addEmailField}>Add Another Guest</button>
-      <br />
+
+      {pastDiners.length > 0 && (
+        <div style={{ marginTop: "1rem" }}>
+          <h4>Invite Again:</h4>
+          {pastDiners.map((email) => (
+            <label
+              key={email}
+              style={{ display: "block", marginBottom: "0.25rem" }}
+            >
+              <input
+                type="checkbox"
+                checked={selectedPast.includes(email)}
+                onChange={() => togglePastDiner(email)}
+              />{" "}
+              {email}
+            </label>
+          ))}
+        </div>
+      )}
+
       <br />
       <button onClick={inviteGuests} disabled={sending}>
         {sending ? "Sending..." : "Send Invites"}

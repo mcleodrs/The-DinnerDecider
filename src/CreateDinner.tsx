@@ -98,25 +98,31 @@ export default function CreateDinner() {
       ...selectedPantry.map((id) => ({
         event_id: eventId,
         option_id: id,
-        type: "pantry",
+        option_type: "pantry",
+        label: pantryOptions.find((opt) => opt.id === id)?.name || "Unnamed",
+        created_by: user.id,
       })),
       ...selectedDineIn.map((id) => ({
         event_id: eventId,
         option_id: id,
-        type: "dine_in",
+        option_type: "dine_in",
+        label: dineInOptions.find((opt) => opt.id === id)?.name || "Unnamed",
+        created_by: user.id,
       })),
       ...selectedDineOut.map((id) => ({
         event_id: eventId,
         option_id: id,
-        type: "dine_out",
+        option_type: "dine_out",
+        label: dineOutOptions.find((opt) => opt.id === id)?.name || "Unnamed",
+        created_by: user.id,
       })),
     ];
-
-    const { error: optionError } = await supabase
+    const { error: insertError } = await supabase
       .from("event_dinner_options")
       .insert(allOptions);
 
-    if (optionError) {
+    if (insertError) {
+      console.error("Insert error:", insertError.message, allOptions);
       alert("Event created but options failed to save.");
       return;
     }
@@ -235,7 +241,7 @@ export default function CreateDinner() {
         <button onClick={() => setActiveTab("dine_in")}>🏠 Dine In</button>
         <button onClick={() => setActiveTab("dine_out")}>🍔 Dine Out</button>
       </div>
-      <br />
+
       <button onClick={createEvent}>Create Event & Invite Guests</button>
       {renderSelectedOptions()}
 
