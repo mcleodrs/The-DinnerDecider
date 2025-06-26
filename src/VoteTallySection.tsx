@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
 
@@ -8,11 +6,13 @@ type Tally = {
   voters: string[];
 };
 
-export default function VoteTallySection() {
+type VoteTallySectionProps = {
+  eventId: string;
+};
+
+export default function VoteTallySection({ eventId }: VoteTallySectionProps) {
   const [tallies, setTallies] = useState<Tally[]>([]);
   const [loading, setLoading] = useState(true);
-
-  const eventId = "c578b937-2458-4319-944a-850ab4f8ad88";
 
   useEffect(() => {
     async function fetchTally() {
@@ -54,24 +54,23 @@ export default function VoteTallySection() {
     }
 
     fetchTally();
-  }, []);
+  }, [eventId]);
 
   return (
-    <main style={{ padding: "2rem" }}>
-      <h1>Vote Tally</h1>
-      <h3>Event ID: {eventId}</h3>
+    <div className="p-4 bg-white rounded shadow">
+      <h2 className="text-xl font-semibold mb-2">Vote Tally</h2>
 
       {loading ? (
         <p>Loading votes...</p>
       ) : tallies.length === 0 ? (
         <p>No votes have been submitted yet.</p>
       ) : (
-        <ul>
+        <ul className="space-y-4">
           {tallies.map((item) => (
-            <li key={item.vote_choice} style={{ marginBottom: "1rem" }}>
+            <li key={item.vote_choice}>
               <strong>{item.vote_choice}</strong> – {item.voters.length} vote
               {item.voters.length !== 1 ? "s" : ""}
-              <ul style={{ marginTop: "0.25rem", marginLeft: "1rem" }}>
+              <ul className="ml-4 list-disc text-sm mt-1">
                 {item.voters.map((name, index) => (
                   <li key={index}>{name}</li>
                 ))}
@@ -80,6 +79,6 @@ export default function VoteTallySection() {
           ))}
         </ul>
       )}
-    </main>
+    </div>
   );
 }
