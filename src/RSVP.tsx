@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import { supabase } from "./supabaseClient";
 
@@ -17,7 +15,12 @@ type VoteOption = {
   vote_choice: string;
 };
 
-export default function RSVP({ eventId }: { eventId: string }) {
+type RSVPProps = {
+  eventId: string;
+  userId: string;
+};
+
+export default function RSVP({ eventId, userId }: RSVPProps) {
   const [event, setEvent] = useState<Event | null>(null);
   const [options, setOptions] = useState<VoteOption[]>([]);
   const [selectedVote, setSelectedVote] = useState("");
@@ -32,16 +35,18 @@ export default function RSVP({ eventId }: { eventId: string }) {
         .single();
 
       if (data) setEvent(data);
+      else console.error("Event fetch error:", error);
     }
 
     async function loadOptions() {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("event_votes")
         .select("id, vote_choice")
         .eq("event_id", eventId)
-        .is("user_id", null); // only original menu options
+        .is("user_id", null); // only chef-defined options
 
       if (data) setOptions(data);
+      else console.error("Vote options error:", error);
     }
 
     loadEvent();
@@ -49,9 +54,8 @@ export default function RSVP({ eventId }: { eventId: string }) {
   }, [eventId]);
 
   const handleSubmit = async () => {
-    const userId = "00000000-0000-0000-0000-000000000002"; // Example diner
+    if (!selectedVote) return;
 
-    // Save vote
     const { error: voteError } = await supabase.from("event_votes").insert([
       {
         event_id: eventId,
@@ -61,7 +65,6 @@ export default function RSVP({ eventId }: { eventId: string }) {
       },
     ]);
 
-    // Save RSVP
     const { error: rsvpError } = await supabase
       .from("event_participants")
       .insert([
@@ -76,12 +79,12 @@ export default function RSVP({ eventId }: { eventId: string }) {
       setSubmitted(true);
     } else {
       console.error({ voteError, rsvpError });
-      alert("Error submitting RSVP");
+      alert("Error submitting RSVP.");
     }
   };
 
   if (!event) return <p>Loading event...</p>;
-  if (submitted) return <p>Thank you for your RSVP!</p>;
+  if (submitted) return <p>✅ Thank you for your RSVP!</p>;
 
   return (
     <div style={{ padding: "2rem" }}>
@@ -101,7 +104,7 @@ export default function RSVP({ eventId }: { eventId: string }) {
 
       <h3>Vote for Dinner:</h3>
       {options.map((opt) => (
-        <label key={opt.id}>
+        <label key={opt.id} style={{ display: "block", margin: "0.5rem 0" }}>
           <input
             type="radio"
             name="vote"
@@ -113,9 +116,11 @@ export default function RSVP({ eventId }: { eventId: string }) {
         </label>
       ))}
 
-      <br />
-      <br />
-      <button disabled={!selectedVote} onClick={handleSubmit}>
+      <button
+        disabled={!selectedVote}
+        onClick={handleSubmit}
+        style={{ marginTop: "1rem", padding: "0.5rem 1rem" }}
+      >
         Submit RSVP
       </button>
     </div>

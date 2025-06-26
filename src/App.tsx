@@ -9,6 +9,8 @@ import "./styles.css";
 import CreateDinner from "./CreateDinner";
 import NavBar from "./NavBar"; // add at top
 import InviteDiners from "./InviteDiners";
+import PWReset from "./PWReset";
+
 
 export default function App() {
   const [themeClass, setThemeClass] = useState("red");
@@ -44,7 +46,8 @@ export default function App() {
         <Route path="/user" element={<UserProfile />} />
         <Route path="/create-event" element={<CreateDinner />} />
         <Route path="/invite-diners" element={<InviteDiners />} />
-      </Routes>
+        <Route path="/reset-password" element={<PWReset />} />
+       </Routes>
     </div>
   );
 }

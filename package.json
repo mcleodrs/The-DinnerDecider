@@ -2,7 +2,12 @@
   "name": "the-dinner-decider",
   "version": "1.0.0",
   "description": "Dinner decision and event planning app",
-  "keywords": ["react", "typescript", "supabase", "vercel"],
+  "keywords": [
+    "react",
+    "typescript",
+    "supabase",
+    "vercel"
+  ],
   "main": "src/index.tsx",
   "scripts": {
     "start": "react-scripts start",
@@ -18,8 +23,8 @@
     "react-scripts": "5.0.1"
   },
   "devDependencies": {
-    "@types/react": "^18.2.38",
-    "@types/react-dom": "^18.2.15",
+    "@types/react": "^18.3.23",
+    "@types/react-dom": "^18.3.7",
     "@types/react-router-dom": "^5.3.3",
     "typescript": "^4.9.5"
   },
