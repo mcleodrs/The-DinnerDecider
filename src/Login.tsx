@@ -44,7 +44,7 @@ export default function Login() {
     };
 
     return (
-        <div>
+        <div className="profile-container">
             <h2>{isRegister ? "Register" : "Login"}</h2>
             <form onSubmit={handleSubmit}>
                 {isRegister && (
@@ -54,12 +54,13 @@ export default function Login() {
                 <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                 <button type="submit">{isRegister ? "Register" : "Login"}</button>
             </form>
-            <button onClick={handleResetPassword} style={{ marginTop: "1rem" }}>Forgot Password?</button>
-            {error && <p style={{ color: "red" }}>{error}</p>}
-            {message && <p style={{ color: "green" }}>{message}</p>}
             <button onClick={() => setIsRegister(!isRegister)} style={{ marginTop: "1rem" }}>
                 {isRegister ? "Already have an account? Login" : "New here? Register"}
             </button>
+            <br  />
+            <button onClick={handleResetPassword} style={{ marginTop: "1rem" }}>Forgot Password?</button>
+            {error && <p style={{ color: "red" }}>{error}</p>}
+            {message && <p style={{ color: "green" }}>{message}</p>}
         </div>
     );
 }
