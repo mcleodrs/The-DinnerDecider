@@ -153,3 +153,13 @@ textarea {
   font-weight: bold;
   color: #444;
 }
+.admin-star {
+    cursor: pointer;
+    user-select: none;
+    transition: transform 0.2s ease;
+    font-size: 1.5rem;
+}
+
+    .admin-star:hover {
+        transform: scale(1.3);
+    }

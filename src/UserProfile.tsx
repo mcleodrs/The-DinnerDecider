@@ -1,183 +1,78 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
+import "./styles.css";
 
-interface UserProfileData {
-  id: string;
-  full_name: string;
-  email: string;
-  role: string;
-  uitheme_pref: string;
-  is_owner: boolean;
-}
+export default function NavBar() {
+    const [user, setUser] = useState<any>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [role, setRole] = useState("");
+    const navigate = useNavigate();
 
-interface Event {
-  id: string;
-  title: string;
-  location: string;
-  event_date: string;
-  event_time: string;
-  details: string;
-  theme_color: string;
-}
+    useEffect(() => {
+        const getSessionUser = async () => {
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
 
-export default function UserProfile() {
-  const [profile, setProfile] = useState<UserProfileData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [editName, setEditName] = useState("");
-  const [themePref, setThemePref] = useState("red");
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState("");
-  const [events, setEvents] = useState<Event[]>([]);
-  const [eventIndex, setEventIndex] = useState(0);
-  const navigate = useNavigate();
+            if (user) {
+                setUser(user);
 
-  useEffect(() => {
-    async function fetchData() {
-      const {
-        data: { user },
-        error: authError,
-      } = await supabase.auth.getUser();
+                const { data: profile } = await supabase
+                    .from("users")
+                    .select("role, is_admin")
+                    .eq("id", user.id)
+                    .single();
 
-      if (authError || !user) {
-        setError("You must be logged in to view your profile.");
-        setLoading(false);
+                if (profile) {
+                    setRole(profile.role);
+                    setIsAdmin(profile.is_admin || false);
+                }
+            }
+        };
+
+        getSessionUser();
+    }, []);
+
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        setUser(null);
         navigate("/login");
-        return;
-      }
+    };
 
-      const { data: profileData } = await supabase
-        .from("users")
-        .select("*")
-        .eq("id", user.id)
-        .single();
+    return (
+        <nav className="navbar">
+            <Link to="/" className="nav-item">
+                🏠 Home
+            </Link>
 
-      if (profileData) {
-        setProfile(profileData);
-        setEditName(profileData.full_name);
-        setThemePref(profileData.uitheme_pref || "red");
-        document.body.className = profileData.uitheme_pref || "red";
-      }
+            {user ? (
+                <>
+                    <Link to="/profile" className="nav-item">
+                        👤 My Profile
+                    </Link>
 
-      const today = new Date().toISOString().split("T")[0];
+                    {role === "Chef" && (
+                        <Link to="/dashboard" className="nav-item">
+                            🍳 Chef Dashboard
+                        </Link>
+                    )}
 
-      /*const { data: upcomingEvents } = await supabase
-        .from("events")
-        .select("*")
-        .eq("chef_id", user.id)
-        .gte("event_date", today)
-        .order("event_date", { ascending: true });*/
-      const { data: upcomingEvents, error: eventError } = await supabase
-        .from("events")
-        .select("*")
-        .eq("chef_id", user.id);
+                    {isAdmin && (
+                        <Link to="/admin" className="nav-item">
+                            🛠️ Admin Console
+                        </Link>
+                    )}
 
-      if (upcomingEvents) setEvents(upcomingEvents);
-
-      setLoading(false);
-    }
-
-    fetchData();
-  }, [navigate]);
-
-  const handleSave = async () => {
-    if (!profile) return;
-    setIsSaving(true);
-
-    const { error: updateError } = await supabase
-      .from("users")
-      .update({ full_name: editName, uitheme_pref: themePref })
-      .eq("id", profile.id);
-
-    if (!updateError) {
-      setProfile({ ...profile, full_name: editName, uitheme_pref: themePref });
-      document.body.className = themePref;
-    } else {
-      console.error(updateError);
-      setError("Failed to update profile.");
-    }
-
-    setIsSaving(false);
-  };
-
-  if (loading) return <p style={{ padding: "1rem" }}>Loading profile...</p>;
-  if (error) return <p style={{ padding: "1rem", color: "red" }}>{error}</p>;
-
-  return (
-    <div className="profile-container">
-      <h1>My Profile</h1>
-
-      <div>
-        <label>
-          Name:
-          <input
-            type="text"
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
-          />
-        </label>
-      </div>
-
-      <div>
-        <label>
-          Email:
-          <input type="text" value={profile?.email || ""} disabled />
-        </label>
-      </div>
-
-      <div>
-        <label>
-          Role:
-          <input type="text" value={profile?.role || ""} disabled />
-        </label>
-      </div>
-
-      <div>
-        <label>
-          Theme Preference:
-          <select
-            value={themePref}
-            onChange={(e) => setThemePref(e.target.value)}
-          >
-            <option value="red">Red (Default)</option>
-            <option value="blue">Blue</option>
-            <option value="dark">Dark</option>
-            <option value="green">Green</option>
-            <option value="brown">Brown</option>
-          </select>
-        </label>
-      </div>
-
-      <br />
-      <button onClick={handleSave} disabled={isSaving}>
-        {isSaving ? "Saving..." : "Save Changes"}
-      </button>
-
-      <hr />
-
-      {profile?.role === "Chef" && (
-        <button onClick={() => navigate("/dashboard")}>
-          Go to Chef Dashboard
-        </button>
-      )}
-
-      <br />
-      <br />
-      <button onClick={() => navigate("/create-event")}>➕ Create Event</button>
-
-      <h2>Upcoming Events</h2>
-      {events.length === 0 ? (
-        <p>No upcoming events found.</p>
-      ) : (
-        <ul>
-          {events.map((event) => (
-            <li key={event.id}>
-              <strong>{event.title}</strong> – {event.event_date} @{" "}
-              {event.event_time} – {event.location}
-            </li>
-          ))}
-        </ul>
-      )}
-    </div>
-  );
+                    <button onClick={handleLogout} className="nav-item nav-button">
+                        🚪 Logout
+                    </button>
+                </>
+            ) : (
+                <Link to="/login" className="nav-item">
+                    🔐 Login / Register
+                </Link>
+            )}
+        </nav>
+    );
 }

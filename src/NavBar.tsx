@@ -1,45 +1,78 @@
-// src/NavBar.tsx
-import { Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
+import "./styles.css";
 
 export default function NavBar() {
-  const [userRole, setUserRole] = useState("");
-  const navigate = useNavigate();
+    const [user, setUser] = useState<any>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [role, setRole] = useState("");
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    const loadRole = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
+    useEffect(() => {
+        const getSessionUser = async () => {
+            const {
+                data: { user },
+            } = await supabase.auth.getUser();
 
-      if (!user) return;
+            if (user) {
+                setUser(user);
 
-      const { data } = await supabase
-        .from("users")
-        .select("role")
-        .eq("id", user.id)
-        .single();
+                const { data: profile } = await supabase
+                    .from("users")
+                    .select("role, is_admin")
+                    .eq("id", user.id)
+                    .single();
 
-      if (data?.role) setUserRole(data.role);
+                if (profile) {
+                    setRole(profile.role);
+                    setIsAdmin(profile.is_admin || false);
+                }
+            }
+        };
+
+        getSessionUser();
+    }, []);
+
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        setUser(null);
+        navigate("/login");
     };
 
-    loadRole();
-  }, []);
+    return (
+        <nav className="navbar">
+            <Link to="/" className="nav-item">
+                🏠 Home
+            </Link>
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate("/login");
-  };
+            {user ? (
+                <>
+                    <Link to="/user" className="nav-item">
+                        👤 Profile
+                    </Link>
 
-  return (
-    <nav className="navbar">
-      <Link to="/">🏠 Home</Link>
-      <Link to="/user">👤 Profile</Link>
-      {userRole === "Chef" && <Link to="/dashboard">🍽️ Chef</Link>}
-      <button onClick={handleLogout} className="logout-button">
-        🚪 Logout
-      </button>
-    </nav>
-  );
+                    {role === "Chef" && (
+                        <Link to="/dashboard" className="nav-item">
+                            🍳 Chef Dashboard
+                        </Link>
+                    )}
+
+                    {isAdmin && (
+                        <Link to="/admin" className="nav-item">
+                            🛠️ Admin Console
+                        </Link>
+                    )}
+
+                    <button onClick={handleLogout} className="nav-item nav-button">
+                        🚪 Logout
+                    </button>
+                </>
+            ) : (
+                <Link to="/login" className="nav-item">
+                    🔐 Login / Register
+                </Link>
+            )}
+        </nav>
+    );
 }

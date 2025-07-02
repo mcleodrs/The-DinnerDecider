@@ -1,55 +1,53 @@
 import { useState } from "react";
 import { supabase } from "./supabaseClient";
 import { useNavigate } from "react-router-dom";
+import "./styles.css";
 
 export default function PWReset() {
-    const [password, setPassword] = useState("");
-    const [confirm, setConfirm] = useState("");
+    const [newPassword, setNewPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
     const navigate = useNavigate();
 
-    const handleReset = async (e: React.FormEvent) => {
+    const handlePasswordReset = async (e: React.FormEvent) => {
         e.preventDefault();
         setError("");
         setMessage("");
 
-        if (password !== confirm) {
+        if (newPassword !== confirmPassword) {
             setError("Passwords do not match.");
             return;
         }
 
-        if (password.length < 8) {
-            setError("Password must be at least 8 characters.");
-            return;
-        }
-
-        const { error } = await supabase.auth.updateUser({ password });
+        const { error } = await supabase.auth.updateUser({
+            password: newPassword,
+        });
 
         if (error) {
             setError(error.message);
         } else {
             setMessage("Password updated successfully. Redirecting to login...");
-            setTimeout(() => navigate("/login"), 3000);
+            setTimeout(() => navigate("/login"), 2000);
         }
     };
 
     return (
-        <div style={{ maxWidth: "400px", margin: "2rem auto" }}>
-            <h2>Reset Password</h2>
-            <form onSubmit={handleReset}>
+        <div className="profile-container">
+            <h2>Reset Your Password</h2>
+            <form onSubmit={handlePasswordReset}>
                 <input
                     type="password"
                     placeholder="New Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
                     required
                 />
                 <input
                     type="password"
-                    placeholder="Confirm Password"
-                    value={confirm}
-                    onChange={(e) => setConfirm(e.target.value)}
+                    placeholder="Confirm New Password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     required
                 />
                 <button type="submit">Update Password</button>

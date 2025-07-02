@@ -10,6 +10,8 @@ import CreateDinner from "./CreateDinner";
 import NavBar from "./NavBar"; // add at top
 import InviteDiners from "./InviteDiners";
 import PWReset from "./PWReset";
+import AdminConsole from "./AdminConsole";
+import Lobby from "./Lobby";
 
 
 export default function App() {
@@ -47,6 +49,8 @@ export default function App() {
         <Route path="/create-event" element={<CreateDinner />} />
         <Route path="/invite-diners" element={<InviteDiners />} />
         <Route path="/reset-password" element={<PWReset />} />
+        <Route path="/lobby" element={<Lobby />} />
+        <Route path="/admin" element={<AdminConsole />} />
        </Routes>
     </div>
   );
