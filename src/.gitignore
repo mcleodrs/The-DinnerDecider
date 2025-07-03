@@ -1,0 +1,26 @@
+# Ignore system and editor junk
+.DS_Store
+Thumbs.db
+*.log
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Build and dependency folders
+node_modules/
+dist/
+build/
+out/
+
+# Copilot and IntelliSense artifacts
+CopilotIndices/
+FileContentIndex/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Supabase and other platform artifacts
+.supabase/
