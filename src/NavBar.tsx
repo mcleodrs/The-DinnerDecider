@@ -42,13 +42,13 @@ export default function NavBar() {
 
     return (
         <nav className="navbar">
-            <Link to="/" className="nav-item">
+            <Link to="/lobby" className="nav-item">
                 🏠 Home
             </Link>
 
             {user ? (
                 <>
-                    <Link to="/user" className="nav-item">
+                    <Link to="/users" className="nav-item">
                         👤 Profile
                     </Link>
 

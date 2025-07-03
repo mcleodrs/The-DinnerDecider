@@ -1,6 +1,7 @@
 ﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
+import "./styles.css";
 
 export default function Lobby() {
     const navigate = useNavigate();
@@ -15,14 +16,29 @@ export default function Lobby() {
         checkUser();
     }, []);
 
+    const navOptions = [
+        { label: "Create Event", route: "/create-event" },
+        { label: "Pantry", route: "/dashboard" },
+        { label: "Profile", route: "/user" },
+        { label: "Settings", route: "/settings" },
+    ];
+
     return (
         <div className="profile-container">
             <h2>Welcome to your Lobby 🍽️</h2>
-            <p>{userEmail}</p>
-            <button onClick={() => navigate("/create-event")}>Create Event</button>
-            <button onClick={() => navigate("/dashboard")}>Pantry</button>
-            <button onClick={() => navigate("/user")}>Profile</button>
-            <button onClick={() => navigate("/settings")}>Settings</button>
+            <p style={{ marginBottom: "1.5rem" }}>{userEmail}</p>
+
+            <div className="horizontal-nav-wrap">
+                {navOptions.map((opt) => (
+                    <button
+                        key={opt.label}
+                        className="nav-option-button"
+                        onClick={() => navigate(opt.route)}
+                    >
+                        {opt.label}
+                    </button>
+                ))}
+            </div>
         </div>
     );
 }

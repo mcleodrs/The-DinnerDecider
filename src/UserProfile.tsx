@@ -1,78 +1,72 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
-import "./styles.css";
+import { useNavigate } from "react-router-dom";
+import { Star } from "lucide-react";
 
-export default function NavBar() {
-    const [user, setUser] = useState<any>(null);
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [role, setRole] = useState("");
+export default function UserProfile() {
+    const [userInfo, setUserInfo] = useState<any>(null);
+    const [clicks, setClicks] = useState(0);
     const navigate = useNavigate();
 
     useEffect(() => {
-        const getSessionUser = async () => {
+        async function fetchUser() {
             const {
                 data: { user },
+                error,
             } = await supabase.auth.getUser();
 
-            if (user) {
-                setUser(user);
-
-                const { data: profile } = await supabase
-                    .from("users")
-                    .select("role, is_admin")
-                    .eq("id", user.id)
-                    .single();
-
-                if (profile) {
-                    setRole(profile.role);
-                    setIsAdmin(profile.is_admin || false);
-                }
+            if (error || !user) {
+                navigate("/login");
+                return;
             }
-        };
 
-        getSessionUser();
-    }, []);
+            const { data, error: profileError } = await supabase
+                .from("users")
+                .select("*")
+                .eq("id", user.id)
+                .single();
 
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-        setUser(null);
-        navigate("/login");
+            if (!profileError && data) {
+                setUserInfo(data);
+            }
+        }
+
+        fetchUser();
+    }, [navigate]);
+
+    const handleSecretClick = () => {
+        const newCount = clicks + 1;
+        if (newCount >= 3) {
+            navigate("/admin");
+        } else {
+            setClicks(newCount);
+            setTimeout(() => setClicks(0), 3000); // reset after 3s
+        }
     };
 
+    if (!userInfo) return <p>Loading profile...</p>;
+
     return (
-        <nav className="navbar">
-            <Link to="/" className="nav-item">
-                🏠 Home
-            </Link>
+        <div className="profile-container">
+            <h2>Welcome, {userInfo.full_name || "User"}!</h2>
+            <p>Email: {userInfo.email}</p>
+            <p>Role: {userInfo.role}</p>
+            <p>Theme Preference: {userInfo.uitheme_pref}</p>
 
-            {user ? (
-                <>
-                    <Link to="/profile" className="nav-item">
-                        👤 My Profile
-                    </Link>
+            {/* Secret Admin Access */}
+            <div
+                style={{
+                    position: "absolute",
+                    top: 10,
+                    right: 10,
+                    cursor: "pointer",
+                }}
+            >
+                <Star onClick={handleSecretClick} style={{ cursor: "pointer" }}>
+                    <title>⭐ Secret Admin Star</title>
+                </Star>
 
-                    {role === "Chef" && (
-                        <Link to="/dashboard" className="nav-item">
-                            🍳 Chef Dashboard
-                        </Link>
-                    )}
-
-                    {isAdmin && (
-                        <Link to="/admin" className="nav-item">
-                            🛠️ Admin Console
-                        </Link>
-                    )}
-
-                    <button onClick={handleLogout} className="nav-item nav-button">
-                        🚪 Logout
-                    </button>
-                </>
-            ) : (
-                <Link to="/login" className="nav-item">
-                    🔐 Login / Register
-                </Link>
-            )}
-        </nav>
+            </div>
+        </div>
     );
 }
