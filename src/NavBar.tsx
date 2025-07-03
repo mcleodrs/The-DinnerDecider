@@ -58,12 +58,6 @@ export default function NavBar() {
                         </Link>
                     )}
 
-                    {isAdmin && (
-                        <Link to="/admin" className="nav-item">
-                            🛠️ Admin Console
-                        </Link>
-                    )}
-
                     <button onClick={handleLogout} className="nav-item nav-button">
                         🚪 Logout
                     </button>

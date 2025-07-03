@@ -60,7 +60,7 @@
               "RelativeDocumentMoniker": "src\\.gitignore",
               "ToolTip": "C:\\Users\\mcleodrs\\source\\repos\\mcleodrs\\The-DinnerDecider\\src\\.gitignore",
               "RelativeToolTip": "src\\.gitignore",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABkAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
               "WhenOpened": "2025-07-03T00:56:35.698Z",
               "EditorCaption": ""
@@ -75,8 +75,7 @@
               "RelativeToolTip": "src\\ChefDashboard.tsx",
               "ViewState": "AgIAAEcAAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2025-07-03T00:04:16.175Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-03T00:04:16.175Z"
             },
             {
               "$type": "Document",
@@ -88,8 +87,7 @@
               "RelativeToolTip": "src\\Users.tsx",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2025-07-02T01:38:20.18Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-02T01:38:20.18Z"
             },
             {
               "$type": "Document",
@@ -101,8 +99,7 @@
               "RelativeToolTip": "src\\styles.css",
               "ViewState": "AgIAANYAAAAAAAAAAAAowPYAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2025-07-02T01:32:37.233Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-02T01:32:37.233Z"
             },
             {
               "$type": "Document",
@@ -114,8 +111,7 @@
               "RelativeToolTip": "src\\NavBar.tsx",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAADIAAAAkAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2025-07-02T01:30:59.422Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-02T01:30:59.422Z"
             },
             {
               "$type": "Document",
@@ -127,8 +123,7 @@
               "RelativeToolTip": "src\\UserProfile.tsx",
               "ViewState": "AgIAACYAAAAAAAAAAAAQwEMAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2025-07-02T01:28:28.458Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-02T01:28:28.458Z"
             },
             {
               "$type": "Document",
@@ -152,8 +147,7 @@
               "RelativeToolTip": "src\\Lobby.tsx",
               "ViewState": "AgIAAA4AAAAAAAAAAAAAACwAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2025-07-02T01:15:12.956Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-02T01:15:12.956Z"
             },
             {
               "$type": "Document",
@@ -165,8 +159,7 @@
               "RelativeToolTip": "src\\App.tsx",
               "ViewState": "AgIAABoAAAAAAAAAAAAAADMAAAAIAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
-              "WhenOpened": "2025-07-02T01:11:27.488Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-07-02T01:11:27.488Z"
             }
           ]
         }
