@@ -1,72 +1,35 @@
-import { useEffect, useState } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "../utils/supabaseClient";
-import "../pages/styles.css";
+import { useAuth } from "../auth/auth";
+import "../styles.css";
 
-export default function NavBar() {
-    const [user, setUser] = useState<any>(null);
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [role, setRole] = useState("");
-    const navigate = useNavigate();
+const NavBar = () => {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-        const getSessionUser = async () => {
-            const {
-                data: { user },
-            } = await supabase.auth.getUser();
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+  };
 
-            if (user) {
-                setUser(user);
+  return (
+    <nav>
+      <div className="nav-links">
+        <Link to="/">🏠 Home</Link>
+        {user && (
+          <>
+            <Link to="/user">👤 Profile</Link>
+            <Link to="/dashboard">🔍 Chef Dashboard</Link>
+          </>
+        )}
+      </div>
+      {user && (
+        <button className="logout-button" onClick={handleLogout}>
+          📕 Logout
+        </button>
+      )}
+    </nav>
+  );
+};
 
-                const { data: profile } = await supabase
-                    .from("users")
-                    .select("role, is_admin")
-                    .eq("id", user.id)
-                    .single();
-
-                if (profile) {
-                    setRole(profile.role);
-                    setIsAdmin(profile.is_admin || false);
-                }
-            }
-        };
-
-        getSessionUser();
-    }, []);
-
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-        setUser(null);
-        navigate("/");
-    };
-
-    return (
-        <nav className="navbar">
-            <Link to="/lobby" className="nav-item">
-                🏠 Home
-            </Link>
-
-            {user ? (
-                <>
-                    <Link to="/users" className="nav-item">
-                        👤 Profile
-                    </Link>
-
-                    {role === "Chef" && (
-                        <Link to="/dashboard" className="nav-item">
-                            🍳 Chef Dashboard
-                        </Link>
-                    )}
-
-                    <button onClick={handleLogout} className="nav-item nav-button">
-                        🚪 Logout
-                    </button>
-                </>
-            ) : (
-                <Link to="/login" className="nav-item">
-                    🔐 Login / Register
-                </Link>
-            )}
-        </nav>
-    );
-}
+export default NavBar;
