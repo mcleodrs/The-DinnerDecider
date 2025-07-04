@@ -42,6 +42,7 @@ export default function UserProfile() {
   if (!userData) return <div className="auth-container">User data not found.</div>;
 
   return (
+    <div  className="centered-container">
     <div className="profile-container">
       <h2>Welcome, {userData.full_name || "Chef"}!</h2>
       <p><strong>Email:</strong> {userData.email}</p>
@@ -60,6 +61,7 @@ export default function UserProfile() {
       <div style={{ marginTop: "1rem", textAlign: "left" }}>
         <a href="/logout" style={{ fontSize: "0.9rem" }}>← Logout</a>
       </div>
+    </div>
     </div>
   );
 }
