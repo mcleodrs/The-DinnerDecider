@@ -47,7 +47,7 @@ export default function UserProfile() {
 
           <div style={{ marginTop: "1.5rem" }}>
             <button onClick={() => navigate("/edit-profile")}>Edit Profile</button>
-            <button style={{ marginLeft: "1rem" }} onClick={() => navigate("/")}>
+            <button style={{ marginLeft: "0rem" }} onClick={() => navigate("/")}>
               Go Home
             </button>
           </div>
