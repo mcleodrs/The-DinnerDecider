@@ -51,10 +51,6 @@ export default function Login() {
             Forgot Password
           </button>
         </div>
-
-        <div className="back-link">
-          <a href="/">&larr; Back to Home</a>
-        </div>
       </div>
     </div>
   );

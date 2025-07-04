@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import "./styles.css";
+import Footer from "./pages/Footer";
 
 export default function Home() {
   return (

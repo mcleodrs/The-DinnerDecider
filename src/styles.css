@@ -5,7 +5,7 @@ body {
   background-size: cover;
   background-repeat: repeat;
   background-color: #fff5f0;
-  background-image: "./img/gingham-bg.png"
+  background-image: "./public/AppBackGround.png"
 }
 
 /* Theme Background Images by App Class */
