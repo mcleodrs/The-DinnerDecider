@@ -5,25 +5,23 @@ body {
   background-size: cover;
   background-repeat: repeat;
   background-color: #fff5f0;
-  background-image: "../assets/img/AppBackGround.png"
+  background-image: url("./assets/img/AppBackGround.png")
 }
 
 /* Theme Background Images by App Class */
 .App.red body {
-  background-image: url("../assets/img/gingham-bg.png");
+  background-image: url("./assets/img/gingham-bg.png");
 }
 
 .App.blue body {
-  background-image: url("../assets/img/blue_gingham.png");
+  background-image: url("./assets/img/blue_gingham.png");
 }
 
 .App.green body {
-  background-image: url("../assets/img/green_gingham.png");
+  background-image: url("./assets/img/green_gingham.png");
 }
 
-/* You can add more like .App.purple, etc. as needed */
-
-/* Primary UI Colors - optional if fixed */
+/* Root Theme Variables */
 :root {
   --primary-color: #C24225;
   --secondary-color: #fff0f0;
@@ -134,25 +132,49 @@ button:hover {
   font-size: 0.9rem;
 }
 
-/* NavBar (optional fixed style) */
+/* NavBar Styles */
 nav {
   background-color: #fff5f0;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   color: var(--text-color);
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: 1rem 2rem;
+}
+
+/* Nav Links Grouping */
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 nav a {
   color: var(--text-color);
-  margin: 0 15px;
   text-decoration: none;
   font-weight: bold;
+  font-size: 1rem;
 }
 
 nav a:hover {
   text-decoration: underline;
 }
 
+/* Logout Button */
+.logout-button {
+  background-color: var(--primary-color);
+  color: white;
+  width: 100px;
+  padding: 8px 14px;
+  font-size: 0.95rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  white-space: nowrap;
+}
+
+.logout-button:hover {
+  background-color: #990000;
+}

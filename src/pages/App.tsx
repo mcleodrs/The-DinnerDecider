@@ -5,7 +5,7 @@ import Home from "./Home";
 import Login from "./Login";
 import ChefDashboard from "./ChefDashboard";
 import UserProfile from "./UserProfile";
-import "./styles.css";
+import "../styles.css";
 import CreateDinner from "./CreateDinner";
 import NavBar from "../components/NavBar"; // add at top
 import InviteDiners from "./InviteDiners";

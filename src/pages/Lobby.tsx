@@ -1,7 +1,7 @@
 ﻿import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabaseClient";
-import "./styles.css";
+import "../styles.css";
 
 export default function Lobby() {
     const navigate = useNavigate();

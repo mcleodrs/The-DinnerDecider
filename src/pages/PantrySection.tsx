@@ -100,6 +100,7 @@ export default function PantrySection() {
   }
 
   return (
+    <div  className="centered-container">
     <div className="profile-container">
       <h2>Pantry Meals</h2>
 
@@ -214,6 +215,7 @@ export default function PantrySection() {
           )}
         </div>
       ))}
+    </div>
     </div>
   );
 }
