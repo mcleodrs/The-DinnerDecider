@@ -1,22 +1,15 @@
 import { useEffect, useState, useRef } from "react";
 import { supabase } from "../utils/supabaseClient";
 import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
-=======
-import NavBar from "../components/NavBar";
->>>>>>> caeb27fe326614e89170f04060a1b480fb814a4f
 import Footer from "../components/Footer";
 
 export default function EditProfile() {
   const [fullName, setFullName] = useState("");
   const [uiTheme, setUiTheme] = useState("red");
   const [savedTheme, setSavedTheme] = useState("red");
-<<<<<<< HEAD
   const [email, setEmail] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
   const [uploading, setUploading] = useState(false);
-=======
->>>>>>> caeb27fe326614e89170f04060a1b480fb814a4f
   const [loading, setLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -46,11 +39,8 @@ export default function EditProfile() {
         setFullName(data.full_name || "");
         setUiTheme(data.uitheme_pref || "red");
         setSavedTheme(data.uitheme_pref || "red");
-<<<<<<< HEAD
         setAvatarUrl(data.avatar_url || "");
         setEmail(user.email || "");
-=======
->>>>>>> caeb27fe326614e89170f04060a1b480fb814a4f
         updateThemeClass(data.uitheme_pref || "red");
       }
 
@@ -62,18 +52,11 @@ export default function EditProfile() {
 
   const updateThemeClass = (theme: string) => {
     const appDiv = document.querySelector(".App");
-<<<<<<< HEAD
     if (appDiv) appDiv.className = `App ${theme}`;
-=======
-    if (appDiv) {
-      appDiv.className = `App ${theme}`;
-    }
->>>>>>> caeb27fe326614e89170f04060a1b480fb814a4f
   };
 
   const handleThemeChange = (value: string) => {
     setUiTheme(value);
-<<<<<<< HEAD
     updateThemeClass(value);
   };
 
@@ -82,7 +65,7 @@ export default function EditProfile() {
     if (!file) return;
 
     const validTypes = ["image/jpeg", "image/png"];
-    const maxSize = 2 * 1024 * 1024; // 2MB
+    const maxSize = 2 * 1024 * 1024;
 
     if (!validTypes.includes(file.type)) {
       alert("Only PNG or JPEG images are allowed.");
@@ -117,7 +100,13 @@ export default function EditProfile() {
       const { data } = supabase.storage.from("avatars").getPublicUrl(filePath);
       const publicUrl = data.publicUrl;
 
-      await supabase.from("users").update({ avatar_url: publicUrl }).eq("id", user.id);
+      const { error: updateError } = await supabase
+        .from("users")
+        .update({ avatar_url: publicUrl })
+        .eq("id", user.id);
+
+      if (updateError) throw updateError;
+
       setAvatarUrl(publicUrl);
     } catch (error) {
       console.error("Avatar upload failed:", error);
@@ -125,9 +114,6 @@ export default function EditProfile() {
     } finally {
       setUploading(false);
     }
-=======
-    updateThemeClass(value); // Update theme live
->>>>>>> caeb27fe326614e89170f04060a1b480fb814a4f
   };
 
   async function handleUpdateProfile(e: React.FormEvent) {
@@ -136,20 +122,21 @@ export default function EditProfile() {
 
     const {
       data: { user },
-<<<<<<< HEAD
-=======
-      error: authError,
->>>>>>> caeb27fe326614e89170f04060a1b480fb814a4f
     } = await supabase.auth.getUser();
+
     if (!user) {
       alert("User not authenticated");
       setLoading(false);
       return;
     }
 
+    // ✅ Log user and schema match
+    console.log("User ID:", user.id);
+
     if (email !== user.email) {
       const { error: emailError } = await supabase.auth.updateUser({ email });
       if (emailError) {
+        console.error("Email update error:", emailError);
         alert("Failed to update email.");
         setLoading(false);
         return;
@@ -163,7 +150,9 @@ export default function EditProfile() {
       updated_at: new Date(),
     };
 
-    const { error } = await supabase.from("users").upsert(updates);
+    console.log("Attempting to upsert:", updates);
+
+    const { data, error } = await supabase.from("users").upsert(updates).select("*");
 
     if (error) {
       console.error("Error updating profile:", error);
@@ -181,6 +170,7 @@ export default function EditProfile() {
       redirectTo: window.location.origin + "/reset",
     });
     if (error) {
+      console.error("Password reset error:", error);
       alert("Failed to send reset email.");
     } else {
       alert("Password reset email sent.");
@@ -193,7 +183,6 @@ export default function EditProfile() {
         <div className="profile-container">
           <h1>Edit Profile</h1>
           <form onSubmit={handleUpdateProfile}>
-<<<<<<< HEAD
             {/* Avatar Upload */}
             <div>
               <label>Avatar:</label>
@@ -225,16 +214,10 @@ export default function EditProfile() {
             <input
               id="fullName"
               type="text"
-=======
-            <input
-              type="text"
-              placeholder="Full Name"
->>>>>>> caeb27fe326614e89170f04060a1b480fb814a4f
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
             />
 
-<<<<<<< HEAD
             <label htmlFor="email" style={{ marginTop: "1rem", display: "block" }}>
               Email:
             </label>
@@ -245,8 +228,6 @@ export default function EditProfile() {
               onChange={(e) => setEmail(e.target.value)}
             />
 
-=======
->>>>>>> caeb27fe326614e89170f04060a1b480fb814a4f
             <label htmlFor="theme" style={{ marginTop: "1rem", display: "block" }}>
               Select UI Theme:
             </label>
@@ -267,11 +248,7 @@ export default function EditProfile() {
               </button>
               <button
                 type="button"
-<<<<<<< HEAD
                 style={{ marginLeft: "0rem" }}
-=======
-                style={{ marginLeft: "1rem" }}
->>>>>>> caeb27fe326614e89170f04060a1b480fb814a4f
                 onClick={() => navigate("/user")}
               >
                 Cancel
@@ -291,13 +268,10 @@ export default function EditProfile() {
             </div>
           </form>
 
-<<<<<<< HEAD
           <div style={{ marginTop: "1rem" }}>
             <button onClick={sendPasswordReset}>Send Password Reset Email</button>
           </div>
 
-=======
->>>>>>> caeb27fe326614e89170f04060a1b480fb814a4f
           <div style={{ marginTop: "1rem", textAlign: "left" }}>
             <a href="/user" style={{ fontSize: "0.9rem" }}>
               ← Back to Profile

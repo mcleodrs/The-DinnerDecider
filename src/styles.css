@@ -9,20 +9,85 @@ body {
 }
 
 /* Theme Background Images by App Class */
+/* Red Theme */
 .App.red {
   background-image: url("./assets/img/gingham-bg.png");
+  background-size: cover;
 }
 
+.App.red h1,
+.App.red h2,
+.App.red h3,
+.App.red h4,
+.App.red h5,
+.App.red h6 {
+  color: #b0412d;
+}
+
+.App.red button.primary {
+  background-color: #b0412d;
+  color: white;
+}
+
+/* Blue Theme */
 .App.blue {
   background-image: url("./assets/img/blue_gingham.png");
+  background-size: cover;
 }
 
+.App.blue h1,
+.App.blue h2,
+.App.blue h3,
+.App.blue h4,
+.App.blue h5,
+.App.blue h6 {
+  color: #3498db;
+}
+
+.App.blue button.primary {
+  background-color: #3498db;
+  color: white;
+}
+
+/* Green Theme */
 .App.green {
   background-image: url("./assets/img/green_gingham.png");
+  background-size: cover;
 }
 
+.App.green h1,
+.App.green h2,
+.App.green h3,
+.App.green h4,
+.App.green h5,
+.App.green h6 {
+  color: #2e8b57;
+}
+
+.App.green button.primary {
+  background-color: #2e8b57;
+  color: white;
+}
+
+
+/* Yellow Theme */
 .App.yellow {
   background-image: url("./assets/img/yellow_gingham.png");
+  background-size: cover;
+}
+
+.App.yellow h1,
+.App.yellow h2,
+.App.yellow h3,
+.App.yellow h4,
+.App.yellow h5,
+.App.yellow h6 {
+  color: #d4af37;
+}
+
+.App.yellow button.primary {
+  background-color: #d4af37;
+  color: white;
 }
 
 
@@ -39,6 +104,7 @@ h1, h2, h3, h4, h5 {
   color: var(--primary-color);
   margin-bottom: 1rem;
 }
+
 
 /* Centering Container */
 .centered-container {
@@ -112,6 +178,26 @@ button:hover {
 
 .secondary-btn:hover {
   background-color: #eee;
+}
+
+.App.red button {
+  background-color: #b0412d;
+  color: white;
+}
+
+.App.blue button {
+  background-color: #3498db;
+  color: white;
+}
+
+.App.green button {
+  background-color: #2e8b57;
+  color: white;
+}
+
+.App.yellow button {
+  background-color: #d4af37;
+  color: white;
 }
 
 /* Back to Home Link */
