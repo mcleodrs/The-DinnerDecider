@@ -24,6 +24,7 @@ export default function Lobby() {
     ];
 
     return (
+        <div  className="centered-container">
         <div className="profile-container">
             <h2>Welcome to your Lobby 🍽️</h2>
             <p style={{ marginBottom: "1.5rem" }}>{userEmail}</p>
@@ -39,6 +40,7 @@ export default function Lobby() {
                     </button>
                 ))}
             </div>
+        </div>
         </div>
     );
 }
