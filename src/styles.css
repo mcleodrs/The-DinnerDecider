@@ -13,11 +13,11 @@ body {
 }
 
 .App.blue body {
-  background-image: url("./img/blue-check-bg.png");
+  background-image: url("./img/blue_gingham.png");
 }
 
 .App.green body {
-  background-image: url("./img/green-check-bg.png");
+  background-image: url("./img/green_gingham.png");
 }
 
 /* You can add more like .App.purple, etc. as needed */
