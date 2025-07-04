@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "../utils/supabaseClient";
-import { Routes, Route } from "react-router-dom"; // ✅ no need for BrowserRouter here
+import { Routes, Route } from "react-router-dom"; // no need for BrowserRouter here
 import Home from "./Home";
 import Login from "./Login";
 import ChefDashboard from "./ChefDashboard";
