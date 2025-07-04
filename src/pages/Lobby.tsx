@@ -2,6 +2,7 @@
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabaseClient";
 import "../styles.css";
+import Footer from "../components/Footer";
 
 export default function Lobby() {
     const navigate = useNavigate();
@@ -42,5 +43,7 @@ export default function Lobby() {
             </div>
         </div>
         </div>
+        
     );
+    <Footer />
 }

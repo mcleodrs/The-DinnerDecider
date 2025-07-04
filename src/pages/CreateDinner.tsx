@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabaseClient";
+import Footer from "../components/Footer";
 
 type Option = {
   id: string;
@@ -265,4 +266,5 @@ export default function CreateDinner() {
       )}
     </div>
   );
+  <Footer />
 }

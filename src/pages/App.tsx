@@ -41,7 +41,7 @@ export default function App() {
 
   return (
     <div className={`App ${themeClass}`}>
-      <NavBar /> {/* ✅ Persistent Navigation */}
+      <NavBar /> {/* Persistent Navigation */}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />

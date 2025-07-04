@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabaseClient";
-import { useAuth } from "../auth/auth"; //  Centralized user state
-import NavBar from "../components/NavBar";
+import { useAuth } from "../auth/auth"; // Centralized user state
 import Footer from "../components/Footer";
 
 export default function UserProfile() {
-  const { user, loading } = useAuth(); //  Centralized loading/user
+  const { user, loading } = useAuth(); // Centralized loading/user
   const [userData, setUserData] = useState<any>(null);
   const navigate = useNavigate();
 
@@ -37,7 +36,6 @@ export default function UserProfile() {
 
   return (
     <>
-      <NavBar />
       <div className="centered-container">
         <div className="profile-container">
           <h2>Welcome, {userData.full_name || "Chef"}!</h2>

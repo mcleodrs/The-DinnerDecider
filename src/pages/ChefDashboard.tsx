@@ -4,6 +4,7 @@ import PantrySection from "./PantrySection";
 import DineInSection from "./DineInSection";
 import DineOutSection from "./DineOutSection";
 import { useNavigate } from "react-router-dom";
+import Footer from "../components/Footer";
 
 type Profile = {
   full_name: string;
@@ -37,7 +38,8 @@ export default function ChefDashboard() {
   }, [navigate]);
 
   return (
-    <main className="profile-container">
+    <div className="centered-container">
+    <div className="profile-container">
       <h1>Chef’s Dashboard</h1>
 
       {profile && (
@@ -90,7 +92,11 @@ export default function ChefDashboard() {
         {activeTab === "pantry" && <PantrySection />}
         {activeTab === "dine_in" && <DineInSection />}
         {activeTab === "dine_out" && <DineOutSection />}
+      </div><Footer />
       </div>
-    </main>
+    </div>
+     
   );
+
 }
+
