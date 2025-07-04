@@ -13,6 +13,7 @@ import PWReset from "./PWReset";
 import AdminConsole from "./AdminConsole";
 import Lobby from "./Lobby";
 import ResetConfirm from "./ResetConfirm";
+import EditProfile from "./EditProfile";
 
 export default function App() {
   const [themeClass, setThemeClass] = useState("red");
@@ -52,6 +53,8 @@ export default function App() {
         <Route path="/lobby" element={<Lobby />} />
         <Route path="/admin" element={<AdminConsole />} />
         <Route path="/reset-confirm" element={<ResetConfirm />} />
+        <Route path="/edit-profile" element={<EditProfile />} />
+        <Route path="/pw-reset" element={<PWReset />} />
        </Routes>
     </div>
   );

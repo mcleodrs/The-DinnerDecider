@@ -1,57 +1,52 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "./supabaseClient";
 import { useNavigate } from "react-router-dom";
 
 export default function ResetConfirm() {
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [message, setMessage] = useState<string | null>(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmed, setConfirmed] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const handleUpdatePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
+  useEffect(() => {
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "PASSWORD_RECOVERY") {
+        setConfirmed(true);
+      }
+    });
+  }, []);
 
-    if (password !== confirm) {
-      setError("Passwords do not match");
-      return;
-    }
-
-    const { error } = await supabase.auth.updateUser({ password });
+  const handleReset = async () => {
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
+    });
 
     if (error) {
       setError(error.message);
     } else {
-      setMessage("Password updated successfully.");
-      setTimeout(() => navigate("/login"), 2000);
+      navigate("/login");
     }
   };
 
   return (
     <div className="auth-container">
       <h1>Set New Password</h1>
-      <form onSubmit={handleUpdatePassword}>
-        <input
-          type="password"
-          placeholder="New Password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
-        />
-        <input
-          type="password"
-          placeholder="Confirm Password"
-          value={confirm}
-          onChange={e => setConfirm(e.target.value)}
-          required
-        />
-        <button type="submit">Update Password</button>
-      </form>
+      {confirmed ? (
+        <>
+          <input
+            type="password"
+            placeholder="New Password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
+          />
+          <button onClick={handleReset}>Update Password</button>
+        </>
+      ) : (
+        <p>Waiting for password recovery confirmation...</p>
+      )}
       {error && <p style={{ color: "red" }}>{error}</p>}
-      {message && <p style={{ color: "green" }}>{message}</p>}
-
-      <div style={{ position: "absolute", bottom: "1rem", left: "1rem" }}>
-        <a href="/">← Back to Home</a>
+      <div style={{ textAlign: "left", marginTop: "1rem" }}>
+        <a href="/login" style={{ fontSize: "0.9rem" }}>← Back</a>
       </div>
     </div>
   );
