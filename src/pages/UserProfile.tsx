@@ -5,21 +5,30 @@ import { useAuth } from "../auth/auth"; // Centralized user state
 import Footer from "../components/Footer";
 
 export default function UserProfile() {
-  const { user, loading } = useAuth(); // Centralized loading/user
+  const { user, loading } = useAuth();
   const [userData, setUserData] = useState<any>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!loading && !user) {
-      navigate("/login");
-    }
-
     const loadProfile = async () => {
-      if (!user) return;
+      let currentUser = user;
+
+      if (!currentUser && !loading) {
+        const { data, error } = await supabase.auth.getUser();
+        if (error || !data?.user) {
+          navigate("/login");
+          return;
+        }
+        currentUser = data.user;
+      }
+
+      if (!currentUser) return;
+
       const { data, error } = await supabase
         .from("users")
         .select("full_name, email, role, uitheme_pref, is_owner, is_admin")
-        .eq("id", user.id)
+        .eq("id", currentUser.id)
         .single();
 
       if (error) {
@@ -27,12 +36,16 @@ export default function UserProfile() {
       } else {
         setUserData(data);
       }
+
+      setProfileLoading(false);
     };
 
     loadProfile();
   }, [user, loading, navigate]);
 
-  if (loading || !userData) return <div className="auth-container">Loading profile...</div>;
+  if (loading || profileLoading || !userData) {
+    return <div className="auth-container">Loading profile...</div>;
+  }
 
   return (
     <>

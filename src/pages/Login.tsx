@@ -1,57 +1,29 @@
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabaseClient";
-import Footer from "../components/Footer";
 
-export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+const Login = () => {
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    setError("");
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const email = (document.getElementById("email") as HTMLInputElement).value;
+    const password = (document.getElementById("password") as HTMLInputElement).value;
+
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
     if (error) {
-      setError(error.message);
+      alert(error.message);
     } else {
-      navigate("/user");
+      navigate("/profile"); // 👈 redirect after login
     }
   };
 
   return (
-    <div className="centered-container">
-      <div className="profile-container">
-        <h2>Login</h2>
-
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <button onClick={handleLogin}>Login</button>
-
-        {error && <p className="error-message">{error}</p>}
-
-        <div className="auth-actions">
-          <button className="secondary-btn" onClick={() => navigate("/register")}>
-            New here? Register
-          </button>
-
-          <button className="secondary-btn" onClick={() => navigate("/pw-reset")}>
-            Forgot Password
-          </button>
-        </div>
-      </div>
-    </div>
+    <form onSubmit={handleLogin}>
+      {/* email, password inputs, buttons */}
+    </form>
   );
-}
+};
+
+export default Login;

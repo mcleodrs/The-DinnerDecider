@@ -24,6 +24,7 @@ export default function EditProfile() {
       if (authError || !user) {
         console.error("User not authenticated.");
         setLoading(false);
+        navigate("/login");
         return;
       }
 
@@ -48,7 +49,7 @@ export default function EditProfile() {
     }
 
     fetchProfile();
-  }, []);
+  }, [navigate]);
 
   const updateThemeClass = (theme: string) => {
     const appDiv = document.querySelector(".App");
@@ -130,9 +131,6 @@ export default function EditProfile() {
       return;
     }
 
-    // ✅ Log user and schema match
-    console.log("User ID:", user.id);
-
     if (email !== user.email) {
       const { error: emailError } = await supabase.auth.updateUser({ email });
       if (emailError) {
@@ -149,8 +147,6 @@ export default function EditProfile() {
       uitheme_pref: uiTheme,
       updated_at: new Date(),
     };
-
-    console.log("Attempting to upsert:", updates);
 
     const { data, error } = await supabase.from("users").upsert(updates).select("*");
 
@@ -176,6 +172,8 @@ export default function EditProfile() {
       alert("Password reset email sent.");
     }
   };
+
+  if (loading) return <div className="auth-container">Loading profile...</div>;
 
   return (
     <>
