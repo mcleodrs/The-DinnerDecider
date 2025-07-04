@@ -9,17 +9,22 @@ body {
 }
 
 /* Theme Background Images by App Class */
-.App.red body {
+.App.red {
   background-image: url("./assets/img/gingham-bg.png");
 }
 
-.App.blue body {
+.App.blue {
   background-image: url("./assets/img/blue_gingham.png");
 }
 
-.App.green body {
+.App.green {
   background-image: url("./assets/img/green_gingham.png");
 }
+
+.App.yellow {
+  background-image: url("./assets/img/yellow_gingham.png");
+}
+
 
 /* Root Theme Variables */
 /* Root Theme Variables */
