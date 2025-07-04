@@ -59,7 +59,7 @@ export default function UserProfile() {
       </div>
 
       <div style={{ marginTop: "1rem", textAlign: "left" }}>
-        <a href="/logout" style={{ fontSize: "0.9rem" }}>← Logout</a>
+        <a href="/lobby" style={{ fontSize: "0.9rem" }}>← Lobby</a>
       </div>
     </div>
     </div>
