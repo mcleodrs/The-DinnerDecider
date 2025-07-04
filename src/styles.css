@@ -2,25 +2,34 @@
 body {
   margin: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #fff5f0;
-  background-image: url("./img/gingham-bg.png"); /* Adjust to match your deployed background path */
   background-size: cover;
   background-repeat: repeat;
+  background-color: #fff5f0;
 }
 
-/* App Theme Variants */
-.App.red {
+/* Theme Background Images by App Class */
+.App.red body {
+  background-image: url("./img/gingham-bg.png");
+}
+
+.App.blue body {
+  background-image: url("./img/blue-check-bg.png");
+}
+
+.App.green body {
+  background-image: url("./img/green-check-bg.png");
+}
+
+/* You can add more like .App.purple, etc. as needed */
+
+/* Primary UI Colors - optional if fixed */
+:root {
   --primary-color: #8b0000;
   --secondary-color: #fff0f0;
   --text-color: #2a2a2a;
 }
 
-.App.blue {
-  --primary-color: #003366;
-  --secondary-color: #e6f0ff;
-  --text-color: #1a1a1a;
-}
-
+/* Headings */
 h1, h2, h3, h4, h5 {
   color: var(--primary-color);
   margin-bottom: 1rem;
@@ -124,7 +133,7 @@ button:hover {
   font-size: 0.9rem;
 }
 
-/* NavBar (if not overridden elsewhere) */
+/* NavBar (optional fixed style) */
 nav {
   padding: 1rem;
   background-color: var(--primary-color);
