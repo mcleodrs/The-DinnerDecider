@@ -12,7 +12,7 @@ export default function Login() {
     e.preventDefault();
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) setError(error.message);
-    else navigate("/profile");
+    else navigate("/user");
   };
 
   return (
