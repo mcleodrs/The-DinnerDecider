@@ -5,20 +5,20 @@ body {
   background-size: cover;
   background-repeat: repeat;
   background-color: #fff5f0;
-  background-image: "./public/AppBackGround.png"
+  background-image: "../assets/img/AppBackGround.png"
 }
 
 /* Theme Background Images by App Class */
 .App.red body {
-  background-image: url("./img/gingham-bg.png");
+  background-image: url("../assets/img/gingham-bg.png");
 }
 
 .App.blue body {
-  background-image: url("./img/blue_gingham.png");
+  background-image: url("../assets/img/blue_gingham.png");
 }
 
 .App.green body {
-  background-image: url("./img/green_gingham.png");
+  background-image: url("../assets/img/green_gingham.png");
 }
 
 /* You can add more like .App.purple, etc. as needed */

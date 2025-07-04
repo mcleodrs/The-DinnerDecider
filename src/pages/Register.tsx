@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { supabase } from "./supabaseClient";
+import { supabase } from "../utils/supabaseClient";
 import { useNavigate, Link } from "react-router-dom";
-import Footer from "./pages/Footer";
+import Footer from "../components/Footer";
 
 export default function Register() {
   const [email, setEmail] = useState("");

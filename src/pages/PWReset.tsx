@@ -1,45 +1,42 @@
 import { useState } from "react";
-import { supabase } from "./supabaseClient";
-import { useNavigate } from "react-router-dom";
+import { supabase } from "../utils/supabaseClient";
 import { Link } from "react-router-dom";
-import Footer from "./pages/Footer";
+import Footer from "../components/Footer";
 
-export default function ResetConfirm() {
-  const [newPassword, setNewPassword] = useState("");
+export default function PWReset() {
+  const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
 
-  const handlePasswordUpdate = async (e: React.FormEvent) => {
+  const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setMessage("");
 
-    const { data, error } = await supabase.auth.updateUser({
-      password: newPassword,
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-confirm`,
     });
 
     if (error) {
       setError(error.message);
     } else {
-      setMessage("Password updated! You can now log in.");
-      setTimeout(() => navigate("/login"), 2500);
+      setMessage("Password reset email sent! Check your inbox.");
     }
   };
 
   return (
     <div className="centered-container">
       <div className="profile-container">
-        <h2>Set New Password</h2>
-        <form onSubmit={handlePasswordUpdate}>
+        <h2>Password Reset</h2>
+        <form onSubmit={handleReset}>
           <input
-            type="password"
-            placeholder="Enter new password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
+            type="email"
+            placeholder="Enter your account email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
-          <button type="submit">Update Password</button>
+          <button type="submit">Send Reset Email</button>
         </form>
 
         <div className="auth-actions">

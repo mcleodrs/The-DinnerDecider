@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { supabase } from "./supabaseClient";
+import { supabase } from "../utils/supabaseClient";
 import { Routes, Route } from "react-router-dom"; // ✅ no need for BrowserRouter here
 import Home from "./Home";
 import Login from "./Login";
@@ -7,7 +7,7 @@ import ChefDashboard from "./ChefDashboard";
 import UserProfile from "./UserProfile";
 import "./styles.css";
 import CreateDinner from "./CreateDinner";
-import NavBar from "./NavBar"; // add at top
+import NavBar from "../components/NavBar"; // add at top
 import InviteDiners from "./InviteDiners";
 import PWReset from "./PWReset";
 import AdminConsole from "./AdminConsole";

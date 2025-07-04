@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { supabase } from "./supabaseClient";
+import { supabase } from "../utils/supabaseClient";
 import VoteOnDinner from "./VoteOnDinner";
 import RSVP from "./RSVP";
 import VoteTallySection from "./VoteTallySection";

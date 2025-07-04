@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { supabase } from "./supabaseClient";
-import "./styles.css";
+import { supabase } from "../utils/supabaseClient";
+import "../styles.css";
 
 export default function NavBar() {
     const [user, setUser] = useState<any>(null);

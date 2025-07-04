@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "./supabaseClient";
-import Footer from "./pages/Footer";
+import { supabase } from "../utils/supabaseClient";
+import Footer from "../components/Footer";
 
 export default function Login() {
   const [email, setEmail] = useState("");

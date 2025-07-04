@@ -1,42 +1,45 @@
 import { useState } from "react";
-import { supabase } from "./supabaseClient";
+import { supabase } from "../utils/supabaseClient";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import Footer from "./pages/Footer";
+import Footer from "../components/Footer";
 
-export default function PWReset() {
-  const [email, setEmail] = useState("");
+export default function ResetConfirm() {
+  const [newPassword, setNewPassword] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
-  const handleReset = async (e: React.FormEvent) => {
+  const handlePasswordUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setMessage("");
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-confirm`,
+    const { data, error } = await supabase.auth.updateUser({
+      password: newPassword,
     });
 
     if (error) {
       setError(error.message);
     } else {
-      setMessage("Password reset email sent! Check your inbox.");
+      setMessage("Password updated! You can now log in.");
+      setTimeout(() => navigate("/login"), 2500);
     }
   };
 
   return (
     <div className="centered-container">
       <div className="profile-container">
-        <h2>Password Reset</h2>
-        <form onSubmit={handleReset}>
+        <h2>Set New Password</h2>
+        <form onSubmit={handlePasswordUpdate}>
           <input
-            type="email"
-            placeholder="Enter your account email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            type="password"
+            placeholder="Enter new password"
+            value={newPassword}
+            onChange={(e) => setNewPassword(e.target.value)}
             required
           />
-          <button type="submit">Send Reset Email</button>
+          <button type="submit">Update Password</button>
         </form>
 
         <div className="auth-actions">
