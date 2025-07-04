@@ -12,7 +12,7 @@ import InviteDiners from "./InviteDiners";
 import PWReset from "./PWReset";
 import AdminConsole from "./AdminConsole";
 import Lobby from "./Lobby";
-
+import ResetConfirm from "./ResetConfirm";
 
 export default function App() {
   const [themeClass, setThemeClass] = useState("red");
@@ -51,6 +51,7 @@ export default function App() {
         <Route path="/reset-password" element={<PWReset />} />
         <Route path="/lobby" element={<Lobby />} />
         <Route path="/admin" element={<AdminConsole />} />
+        <Route path="/reset-confirm" element={<ResetConfirm />} />
        </Routes>
     </div>
   );
