@@ -3,7 +3,7 @@ body {
   margin: 0;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   background-color: #fff5f0;
-  background-image: url("/images/gingham-bg.png"); /* Adjust to match your deployed background path */
+  background-image: url("/img/gingham-bg.png"); /* Adjust to match your deployed background path */
   background-size: cover;
   background-repeat: repeat;
 }
