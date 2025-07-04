@@ -1,68 +1,49 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "./supabaseClient";
-import "./styles.css";
+import { useNavigate, Link } from "react-router-dom";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setMessage("");
-
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setError(error.message);
-    } else {
-      navigate("/user");
-    }
+    if (error) setError(error.message);
+    else navigate("/profile");
   };
 
   return (
-    <div className="profile-container">
-      <h2>Login</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="auth-container">
+      <h1>Login</h1>
+      <form onSubmit={handleLogin}>
         <input
           type="email"
           placeholder="Email"
           value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            setError("");
-            setMessage("");
-          }}
+          onChange={e => setEmail(e.target.value)}
           required
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(e) => {
-            setPassword(e.target.value);
-            setError("");
-            setMessage("");
-          }}
+          onChange={e => setPassword(e.target.value)}
           required
         />
         <button type="submit">Login</button>
       </form>
-
-      <div style={{ marginTop: "1rem" }}>
-        <Link to="/register">New here? Register</Link><br />
-        <Link to="/forgot-password">Forgot Password?</Link>
-      </div>
-
       {error && <p style={{ color: "red" }}>{error}</p>}
-      {message && <p style={{ color: "green" }}>{message}</p>}
 
-      <Link to="/" style={{ position: "absolute", bottom: 10, left: 10, fontSize: "0.9rem" }}>
-        ← Back
-      </Link>
+      <div className="auth-footer-links">
+        <Link to="/register">New here? Register</Link>
+        <Link to="/pwreset">Forgot Password?</Link>
+      </div>
+      <div style={{ position: "absolute", bottom: "1rem", left: "1rem" }}>
+        <Link to="/">← Back to Home</Link>
+      </div>
     </div>
   );
 }

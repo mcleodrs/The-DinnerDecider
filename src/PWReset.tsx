@@ -1,122 +1,47 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "./supabaseClient";
-import { useNavigate, Link } from "react-router-dom";
-import "./styles.css";
+import { Link } from "react-router-dom";
 
 export default function PWReset() {
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-  const [tokenReady, setTokenReady] = useState(false);
-  const navigate = useNavigate();
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const hashParams = new URLSearchParams(window.location.hash.slice(1));
-    const access_token = hashParams.get("access_token");
-    const refresh_token = hashParams.get("refresh_token");
-
-    if (access_token && refresh_token) {
-      supabase.auth
-        .setSession({
-          access_token,
-          refresh_token,
-        })
-        .then(({ error }) => {
-          if (error) {
-            setError("Session could not be established.");
-          } else {
-            setTokenReady(true);
-          }
-        });
-    } else {
-      setError("Missing token. Please use the link in your email.");
-    }
-  }, []);
-
-  const handlePasswordReset = async (e: React.FormEvent) => {
+  const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setMessage("");
-
-    if (newPassword !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
-    const { error } = await supabase.auth.updateUser({
-      password: newPassword,
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-confirm`,
     });
-
-    if (error) {
-      setError(error.message);
-    } else {
-      setMessage("✅ Password updated! Redirecting to login...");
-      setTimeout(() => navigate("/login"), 2000);
+    if (error) setError(error.message);
+    else {
+      setMessage("Password reset email sent.");
+      setError(null);
     }
   };
 
   return (
-    <div className="profile-container" style={{ position: "relative", maxWidth: 400, margin: "auto", padding: "2rem" }}>
-      <h2 style={{ textAlign: "center" }}>Reset Your Password</h2>
+    <div className="auth-container">
+      <h1>Reset Password</h1>
+      <form onSubmit={handleReset}>
+        <input
+          type="email"
+          placeholder="Enter your account email"
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          required
+        />
+        <button type="submit">Send Reset Link</button>
+      </form>
+      {error && <p style={{ color: "red" }}>{error}</p>}
+      {message && <p style={{ color: "green" }}>{message}</p>}
 
-      {tokenReady ? (
-        <form onSubmit={handlePasswordReset}>
-          <label htmlFor="newPassword" style={{ display: "block", marginTop: "1rem" }}>New Password</label>
-          <input
-            id="newPassword"
-            type="password"
-            placeholder="Enter new password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-            style={{ width: "100%", padding: "0.5rem", marginBottom: "1rem" }}
-          />
-
-          <label htmlFor="confirmPassword" style={{ display: "block" }}>Confirm Password</label>
-          <input
-            id="confirmPassword"
-            type="password"
-            placeholder="Confirm new password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-            style={{ width: "100%", padding: "0.5rem" }}
-          />
-
-          <button
-            type="submit"
-            style={{
-              width: "100%",
-              marginTop: "1.5rem",
-              padding: "0.75rem",
-              backgroundColor: "#4CAF50",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer"
-            }}
-          >
-            Update Password
-          </button>
-        </form>
-      ) : (
-        <p style={{ marginTop: "1rem" }}>Preparing reset form...</p>
-      )}
-
-      {error && <p style={{ color: "red", marginTop: "1rem" }}>{error}</p>}
-      {message && <p style={{ color: "green", marginTop: "1rem" }}>{message}</p>}
-
-      <Link to="/login" style={{
-        position: "absolute",
-        bottom: "1rem",
-        left: "1rem",
-        color: "#007bff",
-        fontSize: "0.9rem",
-        textDecoration: "none"
-      }}>
-        ← Back to Login
-      </Link>
+      <div className="auth-footer-links">
+        <Link to="/login">Back to Login</Link>
+        <Link to="/register">New here?</Link>
+      </div>
+      <div style={{ position: "absolute", bottom: "1rem", left: "1rem" }}>
+        <Link to="/">← Back to Home</Link>
+      </div>
     </div>
   );
 }
