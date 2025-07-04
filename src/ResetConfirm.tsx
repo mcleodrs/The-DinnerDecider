@@ -28,7 +28,7 @@ export default function ResetConfirm() {
 
   return (
     <div className="centered-container">
-      <div className="form-card">
+      <div className="profile-container">
         <h2>Set New Password</h2>
         <form onSubmit={handlePasswordUpdate}>
           <input

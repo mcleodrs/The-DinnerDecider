@@ -20,7 +20,7 @@ export default function Login() {
 
   return (
     <div className="centered-container">
-      <div className="form-card">
+      <div className="profile-container">
         <h2>Login</h2>
 
         <input

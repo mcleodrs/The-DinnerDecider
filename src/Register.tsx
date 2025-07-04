@@ -53,7 +53,7 @@ export default function Register() {
 
   return (
     <div className="centered-container">
-      <div className="form-card">
+      <div className="profile-container">
         <h2>Register</h2>
         <form onSubmit={handleRegister}>
           <input

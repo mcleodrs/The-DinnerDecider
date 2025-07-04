@@ -25,7 +25,7 @@ export default function PWReset() {
 
   return (
     <div className="centered-container">
-      <div className="form-card">
+      <div className="profile-container">
         <h2>Password Reset</h2>
         <form onSubmit={handleReset}>
           <input

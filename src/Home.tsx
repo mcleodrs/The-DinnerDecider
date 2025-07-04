@@ -3,6 +3,7 @@ import "./styles.css";
 
 export default function Home() {
   return (
+    <div  className="centered-container">
     <div className="profile-container">
       <h1>🍽️ Welcome to The Dinner Decider</h1>
       <p style={{ fontSize: "1.1rem", marginBottom: "1.5rem" }}>
@@ -13,6 +14,7 @@ export default function Home() {
       <Link to="/login">
         <button className="action-button">🔐 Log In to Get Started</button>
       </Link>
+    </div>
     </div>
   );
 }
