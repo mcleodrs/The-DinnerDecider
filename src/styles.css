@@ -1,262 +1,146 @@
-/* ===========================
-   Global Styles
-=========================== */
-
+/* Base Styling */
 body {
-    margin: 0;
-    font-family: "Segoe UI", sans-serif;
-    background-image: url("/public/AppBackGround.png");
-    background-size: cover;
-    background-repeat: repeat;
-    background-attachment: fixed;
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #fff5f0;
+  background-image: url("/images/gingham-bg.png"); /* Adjust to match your deployed background path */
+  background-size: cover;
+  background-repeat: repeat;
 }
 
-/* ===========================
-   App Shell
-=========================== */
-
-.App {
-    font-family: sans-serif;
-    text-align: center;
+/* App Theme Variants */
+.App.red {
+  --primary-color: #8b0000;
+  --secondary-color: #fff0f0;
+  --text-color: #2a2a2a;
 }
 
-/* ===========================
-   Theme Backgrounds
-=========================== */
-
-.red {
-    background-image: url("/public/AppBackGround.png");
-    background-size: cover;
-    background-repeat: repeat;
-    background-attachment: fixed;
-    color: #380101;
+.App.blue {
+  --primary-color: #003366;
+  --secondary-color: #e6f0ff;
+  --text-color: #1a1a1a;
 }
 
-.blue {
-    background-color: #ddeeff;
-    color: #222;
+h1, h2, h3, h4, h5 {
+  color: var(--primary-color);
+  margin-bottom: 1rem;
 }
 
-.dark {
-    background-color: #222;
-    color: #fff;
+/* Centering Container */
+.centered-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 4rem 1rem;
 }
 
-.green {
-    background-color: #e7fce9;
-    color: #222;
+/* Form Card */
+.form-card {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  text-align: center;
 }
 
-.brown {
-    background-color: #f7efe5;
-    color: #3b2f2f;
+/* Inputs */
+input[type="email"],
+input[type="password"],
+input[type="text"],
+select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
 }
 
-/* ===========================
-   Reusable UI Elements
-=========================== */
-
+/* Main Button */
 button {
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
+  margin-top: 1rem;
+  width: 100%;
+  background-color: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px;
+  font-weight: bold;
+  font-size: 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-input,
-select,
-textarea {
-    padding: 0.5rem;
-    margin: 0.5rem 0;
-    border-radius: 0.25rem;
-    border: 1px solid #ccc;
-    width: 100%;
-    box-sizing: border-box;
+button:hover {
+  background-color: #a00000;
 }
 
-/* ===========================
-   User Profile
-=========================== */
-
-.profile-container {
-    background-color: rgba(255, 255, 255, 0.95);
-    border-radius: 1rem;
-    padding: 2rem;
-    max-width: 500px;
-    margin: 2rem auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+/* Secondary Buttons */
+.auth-actions {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
-/* ===========================
-   Auth (Login/Register/Reset)
-=========================== */
-
-.auth-container {
-    background-color: rgba(255, 255, 255, 0.95);
-    border-radius: 1rem;
-    padding: 2rem;
-    max-width: 400px;
-    margin: 5vh auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+.secondary-btn {
+  background-color: #f5f5f5;
+  border: 1px solid #aaa;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #333;
 }
 
-.auth-container h1 {
-    margin-bottom: 1rem;
+.secondary-btn:hover {
+  background-color: #eee;
 }
 
-.auth-container input {
-    width: 100%;
-    margin-bottom: 1rem;
-    font-size: 1rem;
+/* Back to Home Link */
+.back-link {
+  margin-top: 1rem;
+  text-align: left;
+  width: 100%;
 }
 
-.auth-container button {
-    width: 100%;
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
+.back-link a {
+  color: var(--text-color);
+  text-decoration: none;
+  font-size: 0.9rem;
 }
 
-.auth-footer-links {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 1rem;
-    font-size: 0.9rem;
+.back-link a:hover {
+  text-decoration: underline;
 }
 
-.auth-footer-links a {
-    color: #4444cc;
-    text-decoration: none;
+/* Error Message */
+.error-message {
+  color: red;
+  margin-top: 1rem;
+  font-size: 0.9rem;
 }
 
-.auth-footer-links a:hover {
-    text-decoration: underline;
+/* NavBar (if not overridden elsewhere) */
+nav {
+  padding: 1rem;
+  background-color: var(--primary-color);
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-/* ===========================
-   Responsive Enhancements
-=========================== */
-
-@media (min-width: 768px) {
-    .auth-container {
-        padding: 3rem;
-        max-width: 500px;
-    }
-
-    .auth-container input,
-    .auth-container button {
-        font-size: 1.1rem;
-    }
+nav a {
+  color: white;
+  margin: 0 10px;
+  text-decoration: none;
+  font-weight: bold;
 }
 
-/* ===========================
-   Navbar
-=========================== */
-
-.navbar {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    padding: 0.75rem;
-    background-color: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(6px);
-    border-bottom: 1px solid #ccc;
-    position: sticky;
-    top: 0;
-    z-index: 10;
-}
-
-.navbar a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-}
-
-.logout-button {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    font-weight: bold;
-    color: #444;
-}
-
-/* ===========================
-   Admin Star (Easter Egg)
-=========================== */
-
-.admin-star {
-    cursor: pointer;
-    user-select: none;
-    transition: transform 0.2s ease;
-    font-size: 1.5rem;
-}
-
-.admin-star:hover {
-    transform: scale(1.3);
-}
-
-/* ===========================
-   Lobby Grid (Card Style)
-=========================== */
-
-.lobby-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1.5rem;
-    margin-top: 1rem;
-}
-
-.lobby-card {
-    background-color: #fff;
-    padding: 1rem;
-    border-radius: 1rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    cursor: pointer;
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.lobby-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-}
-
-.lobby-emoji {
-    font-size: 2rem;
-    margin-bottom: 0.5rem;
-}
-
-.lobby-label {
-    font-weight: bold;
-    font-size: 1rem;
-}
-
-/* ===========================
-   Lobby Horizontal Nav
-=========================== */
-
-.horizontal-nav-wrap {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1rem;
-    justify-content: center;
-    margin-top: 1rem;
-}
-
-.nav-option-button {
-    background-color: #fefefe;
-    border: 2px solid #880000;
-    color: #440000;
-    font-weight: bold;
-    padding: 0.75rem 1.25rem;
-    border-radius: 0.75rem;
-    min-width: 180px;
-    text-align: center;
-    transition: all 0.2s ease;
-    cursor: pointer;
-}
-
-.nav-option-button:hover {
-    background-color: #ffeeee;
-    transform: translateY(-2px);
+nav a:hover {
+  text-decoration: underline;
 }
