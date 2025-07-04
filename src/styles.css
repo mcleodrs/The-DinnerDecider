@@ -5,6 +5,7 @@ body {
   background-size: cover;
   background-repeat: repeat;
   background-color: #fff5f0;
+  background-image: "./img/gingham-bg.png"
 }
 
 /* Theme Background Images by App Class */
@@ -24,7 +25,7 @@ body {
 
 /* Primary UI Colors - optional if fixed */
 :root {
-  --primary-color: #8b0000;
+  --primary-color: #C24225;
   --secondary-color: #fff0f0;
   --text-color: #2a2a2a;
 }
@@ -135,17 +136,18 @@ button:hover {
 
 /* NavBar (optional fixed style) */
 nav {
-  padding: 1rem;
-  background-color: var(--primary-color);
-  color: white;
+  background-color: #fff5f0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  color: var(--text-color);
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
+  padding: 1rem;
 }
 
 nav a {
-  color: white;
-  margin: 0 10px;
+  color: var(--text-color);
+  margin: 0 15px;
   text-decoration: none;
   font-weight: bold;
 }
@@ -153,3 +155,4 @@ nav a {
 nav a:hover {
   text-decoration: underline;
 }
+

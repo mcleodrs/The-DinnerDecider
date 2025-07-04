@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "./supabaseClient";
 import { Link } from "react-router-dom";
+import Footer from "./pages/Footer";
 
 export default function PWReset() {
   const [email, setEmail] = useState("");

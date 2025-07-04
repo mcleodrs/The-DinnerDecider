@@ -2,6 +2,7 @@ import { useState } from "react";
 import { supabase } from "./supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import Footer from "./pages/Footer";
 
 export default function ResetConfirm() {
   const [newPassword, setNewPassword] = useState("");
