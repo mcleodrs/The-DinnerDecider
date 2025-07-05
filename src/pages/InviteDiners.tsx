@@ -1,31 +1,34 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "../utils/supabaseClient";
 
 export default function InviteDiners() {
   const location = useLocation();
+  const navigate = useNavigate();
   const eventId = new URLSearchParams(location.search).get("event_id");
 
-  const [emails, setEmails] = useState<string[]>([""]);
+  const [emailInput, setEmailInput] = useState("");
+  const [guests, setGuests] = useState<{ email: string; checked: boolean }[]>([]);
   const [pastDiners, setPastDiners] = useState<string[]>([]);
   const [selectedPast, setSelectedPast] = useState<string[]>([]);
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState("");
 
-  const handleEmailChange = (index: number, value: string) => {
-    const updated = [...emails];
-    updated[index] = value;
-    setEmails(updated);
+  const handleAddGuest = () => {
+    const trimmed = emailInput.trim();
+    if (!trimmed || guests.some((g) => g.email === trimmed)) return;
+    setGuests([...guests, { email: trimmed, checked: false }]);
+    setEmailInput("");
   };
 
-  const addEmailField = () => {
-    setEmails([...emails, ""]);
+  const toggleGuestCheck = (index: number) => {
+    const updated = [...guests];
+    updated[index].checked = !updated[index].checked;
+    setGuests(updated);
   };
 
-  const removeEmailField = (index: number) => {
-    const updated = [...emails];
-    updated.splice(index, 1);
-    setEmails(updated);
+  const handleRemoveChecked = () => {
+    setGuests(guests.filter((g) => !g.checked));
   };
 
   const togglePastDiner = (email: string) => {
@@ -41,12 +44,12 @@ export default function InviteDiners() {
     }
 
     const allEmails = [
-      ...emails.filter((email) => email.trim() !== ""),
+      ...guests.map((g) => g.email),
       ...selectedPast,
-    ];
+    ].filter((email, i, arr) => arr.indexOf(email) === i); // unique
 
     if (allEmails.length === 0) {
-      setMessage("Please enter at least one valid email.");
+      setMessage("Please enter at least one guest.");
       return;
     }
 
@@ -55,12 +58,10 @@ export default function InviteDiners() {
 
     const insertData = allEmails.map((email) => ({
       event_id: eventId,
-      guest_email: email.trim(),
+      guest_email: email,
     }));
 
-    const { error } = await supabase
-      .from("event_participants")
-      .insert(insertData);
+    const { error } = await supabase.from("event_participants").insert(insertData);
 
     if (error) {
       console.error(error);
@@ -95,51 +96,92 @@ export default function InviteDiners() {
   }, []);
 
   return (
-    <div className="profile-container">
-      <h1>Invite Diners</h1>
+    <div className="centered-container">
+      <div className="profile-container">
+        <h1>Invite Diners</h1>
 
-      {emails.map((email, index) => (
-        <div key={index} style={{ marginBottom: "0.5rem" }}>
+        {/* Input Row */}
+        <div className="form-row" style={{ display: "flex", gap: "0.5rem" }}>
           <input
             type="email"
-            value={email}
-            onChange={(e) => handleEmailChange(index, e.target.value)}
             placeholder="guest@example.com"
-            required
+            value={emailInput}
+            onChange={(e) => setEmailInput(e.target.value)}
+            style={{ flex: 1 }}
           />
-          {emails.length > 1 && (
-            <button onClick={() => removeEmailField(index)}>Remove</button>
-          )}
+          <button type="button" className="action-button" onClick={handleAddGuest}>
+            Add
+          </button>
+          <button
+            type="button"
+            className="action-button"
+            onClick={handleRemoveChecked}
+            style={{ backgroundColor: "#aa3333" }}
+          >
+            Remove Selected
+          </button>
         </div>
-      ))}
 
-      <button onClick={addEmailField}>Add Another Guest</button>
-
-      {pastDiners.length > 0 && (
-        <div style={{ marginTop: "1rem" }}>
-          <h4>Invite Again:</h4>
-          {pastDiners.map((email) => (
-            <label
-              key={email}
-              style={{ display: "block", marginBottom: "0.25rem" }}
+        {/* Guest List */}
+        <ul style={{ marginTop: "1rem", paddingLeft: 0 }}>
+          {guests.map((guest, index) => (
+            <li
+              key={guest.email}
+              style={{
+                listStyle: "none",
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "0.5rem",
+              }}
             >
               <input
                 type="checkbox"
-                checked={selectedPast.includes(email)}
-                onChange={() => togglePastDiner(email)}
-              />{" "}
-              {email}
-            </label>
+                checked={guest.checked}
+                onChange={() => toggleGuestCheck(index)}
+                style={{ marginRight: "0.5rem" }}
+              />
+              {guest.email}
+            </li>
           ))}
+        </ul>
+
+        {/* Past Diners */}
+        {pastDiners.length > 0 && (
+          <div style={{ marginTop: "1rem" }}>
+            <h4>Invite Again:</h4>
+            {pastDiners.map((email) => (
+              <label key={email} style={{ display: "block" }}>
+                <input
+                  type="checkbox"
+                  checked={selectedPast.includes(email)}
+                  onChange={() => togglePastDiner(email)}
+                  style={{ marginRight: "0.5rem" }}
+                />
+                {email}
+              </label>
+            ))}
+          </div>
+        )}
+
+        {/* Buttons */}
+        <button
+          className="action-button"
+          onClick={inviteGuests}
+          disabled={sending}
+          style={{ marginTop: "1rem" }}
+        >
+          {sending ? "Sending..." : "Send Invites"}
+        </button>
+
+        {/* Back Link */}
+        <div style={{ marginTop: "1rem", textAlign: "left" }}>
+          <a href="/CreateDinner" style={{ fontSize: "0.9rem" }}>
+            ← Back to Profile
+          </a>
         </div>
-      )}
 
-      <br />
-      <button onClick={inviteGuests} disabled={sending}>
-        {sending ? "Sending..." : "Send Invites"}
-      </button>
-
-      {message && <p style={{ marginTop: "1rem" }}>{message}</p>}
+        {message && <p style={{ marginTop: "1rem" }}>{message}</p>}
+      </div>
     </div>
   );
 }

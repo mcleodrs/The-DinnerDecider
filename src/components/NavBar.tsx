@@ -16,11 +16,12 @@ const NavBar = () => {
   return (
     <nav>
       <div className="nav-links">
-        <Link to="/">🏠 Home</Link>
+        <Link to="/">Home</Link>
         {user && (
           <>
-            <Link to="/user">👤 Profile</Link>
-            <Link to="/dashboard">🍽️ Chef Dashboard</Link>
+            <Link to="/lobby">Lobby</Link>
+            <Link to="/user">Profile</Link>
+            <Link to="/dashboard">Chef Dashboard</Link>
           </>
         )}
       </div>

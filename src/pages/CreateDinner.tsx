@@ -177,6 +177,7 @@ export default function CreateDinner() {
           const isSelected = selected.includes(opt.id);
           return (
             <button
+              type="button"
               key={opt.id}
               onClick={() => toggleSelection(opt.id, type)}
               style={{
@@ -263,7 +264,9 @@ export default function CreateDinner() {
                   onChange={(e) => setDetails(e.target.value)}
                 />
               </div>
-
+              <button type="submit" className="action-button" style={{ marginTop: "1rem" }}>
+                Create Event & Invite Guests
+              </button>
               <h2 className="section-title">Choose Event Options:</h2>
 
               <div
@@ -306,9 +309,7 @@ export default function CreateDinner() {
                 </>
               )}
 
-              <button type="submit" className="action-button" style={{ marginTop: "1rem" }}>
-                Create Event & Invite Guests
-              </button>
+
             </form>
           </div>
         </div>
