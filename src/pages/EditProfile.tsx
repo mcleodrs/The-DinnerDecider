@@ -254,7 +254,7 @@ export default function EditProfile() {
               {uiTheme !== savedTheme && (
                 <button
                   type="button"
-                  style={{ marginLeft: "1rem" }}
+                  style={{ marginLeft: "0rem" }}
                   onClick={() => {
                     setUiTheme(savedTheme);
                     updateThemeClass(savedTheme);
