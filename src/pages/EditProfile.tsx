@@ -8,7 +8,7 @@ export default function EditProfile() {
   const [uiTheme, setUiTheme] = useState("red");
   const [savedTheme, setSavedTheme] = useState("red");
   const [email, setEmail] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("/default-avatar.png");
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -35,12 +35,12 @@ export default function EditProfile() {
         .single();
 
       if (error) {
-        console.error("Error loading profile:", error);
+        console.error("Error loading profile:", error.message);
       } else {
         setFullName(data.full_name || "");
         setUiTheme(data.uitheme_pref || "red");
         setSavedTheme(data.uitheme_pref || "red");
-        setAvatarUrl(data.avatar_url || "");
+        setAvatarUrl(data.avatar_url || "/default-avatar.png");
         setEmail(user.email || "");
         updateThemeClass(data.uitheme_pref || "red");
       }
@@ -109,8 +109,8 @@ export default function EditProfile() {
       if (updateError) throw updateError;
 
       setAvatarUrl(publicUrl);
-    } catch (error) {
-      console.error("Avatar upload failed:", error);
+    } catch (error: any) {
+      console.error("Avatar upload failed:", error.message || error);
       alert("Avatar upload failed.");
     } finally {
       setUploading(false);
@@ -134,7 +134,7 @@ export default function EditProfile() {
     if (email !== user.email) {
       const { error: emailError } = await supabase.auth.updateUser({ email });
       if (emailError) {
-        console.error("Email update error:", emailError);
+        console.error("Email update error:", emailError.message);
         alert("Failed to update email.");
         setLoading(false);
         return;
@@ -145,13 +145,13 @@ export default function EditProfile() {
       id: user.id,
       full_name: fullName.trim(),
       uitheme_pref: uiTheme,
-      updated_at: new Date(),
+      updated_at: new Date().toISOString(),
     };
 
-    const { data, error } = await supabase.from("users").upsert(updates).select("*");
+    const { error } = await supabase.from("users").upsert(updates).eq("id", user.id);
 
     if (error) {
-      console.error("Error updating profile:", error);
+      console.error("Error updating profile:", error.message || error);
       alert("Failed to update profile.");
     } else {
       alert("Profile updated!");
@@ -166,7 +166,7 @@ export default function EditProfile() {
       redirectTo: window.location.origin + "/reset",
     });
     if (error) {
-      console.error("Password reset error:", error);
+      console.error("Password reset error:", error.message);
       alert("Failed to send reset email.");
     } else {
       alert("Password reset email sent.");
@@ -181,7 +181,6 @@ export default function EditProfile() {
         <div className="profile-container">
           <h1>Edit Profile</h1>
           <form onSubmit={handleUpdateProfile}>
-            {/* Avatar Upload */}
             <div>
               <label>Avatar:</label>
               <div
@@ -190,7 +189,7 @@ export default function EditProfile() {
                 title={uploading ? "Uploading..." : "Click to change avatar"}
               >
                 <img
-                  src={avatarUrl || "https://via.placeholder.com/100"}
+                  src={avatarUrl}
                   alt="avatar"
                   width="100"
                   height="100"
@@ -244,17 +243,12 @@ export default function EditProfile() {
               <button type="submit" disabled={loading}>
                 {loading ? "Updating..." : "Update Profile"}
               </button>
-              <button
-                type="button"
-                style={{ marginLeft: "0rem" }}
-                onClick={() => navigate("/user")}
-              >
+              <button type="button" onClick={() => navigate("/user")}>
                 Cancel
               </button>
               {uiTheme !== savedTheme && (
                 <button
                   type="button"
-                  style={{ marginLeft: "0rem" }}
                   onClick={() => {
                     setUiTheme(savedTheme);
                     updateThemeClass(savedTheme);
@@ -266,7 +260,7 @@ export default function EditProfile() {
             </div>
           </form>
 
-          <div style={{ marginTop: "1rem" }}>
+          <div style={{ marginTop: "0rem" }}>
             <button onClick={sendPasswordReset}>Send Password Reset Email</button>
           </div>
 

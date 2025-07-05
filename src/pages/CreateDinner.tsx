@@ -69,11 +69,16 @@ export default function CreateDinner() {
     set(updated);
   };
 
-  const createEvent = async () => {
+  const createEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
-    if (!user) return;
+    if (!user) {
+      alert("You must be logged in.");
+      return;
+    }
 
     const { data, error } = await supabase
       .from("events")
@@ -118,6 +123,7 @@ export default function CreateDinner() {
         created_by: user.id,
       })),
     ];
+
     const { error: insertError } = await supabase
       .from("event_dinner_options")
       .insert(allOptions);
@@ -203,68 +209,111 @@ export default function CreateDinner() {
   };
 
   return (
-    <div className="profile-container">
-      <h1>Create Event</h1>
+    <>
+      <div className="centered-container">
+        <div className="profile-container">
+          <div className="event-form-container">
+            <h1 className="form-title">Create Event</h1>
 
-      <label>Event Title:</label>
-      <input value={title} onChange={(e) => setTitle(e.target.value)} />
+            <form onSubmit={createEvent} className="event-form">
+              <div className="form-row">
+                <label htmlFor="title">Event Title: </label>
+                <input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </div>
+              <div className="form-row">
+                <label htmlFor="location">Location: </label>
+                <input
+                  id="location"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                />
+              </div>
+              <div className="form-row two-col">
+                <div>
+                  <label htmlFor="date">Date: </label>
+                  <input
+                    id="date"
+                    type="date"
+                    value={eventDate}
+                    onChange={(e) => setEventDate(e.target.value)}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="time">Time: </label>
+                  <input
+                    id="time"
+                    type="time"
+                    value={eventTime}
+                    onChange={(e) => setEventTime(e.target.value)}
+                  />
+                </div>
+                <br />
+              </div>
 
-      <label>Location:</label>
-      <input value={location} onChange={(e) => setLocation(e.target.value)} />
+              <div className="form-row">
+                <label htmlFor="details">Details:</label>
+                <textarea
+                  id="details"
+                  rows={4}
+                  value={details}
+                  onChange={(e) => setDetails(e.target.value)}
+                />
+              </div>
 
-      <label>Date:</label>
-      <input
-        type="date"
-        value={eventDate}
-        onChange={(e) => setEventDate(e.target.value)}
-      />
+              <h2 className="section-title">Choose Event Options:</h2>
 
-      <label>Time:</label>
-      <input
-        type="time"
-        value={eventTime}
-        onChange={(e) => setEventTime(e.target.value)}
-      />
+              <div
+                style={{
+                  display: "flex",
+                  gap: "1rem",
+                  justifyContent: "center",
+                  marginBottom: "1rem",
+                }}
+              >
+                <button type="button" onClick={() => setActiveTab("pantry")}>
+                  🧺 Pantry
+                </button>
+                <button type="button" onClick={() => setActiveTab("dine_in")}>
+                  🏠 Dine In
+                </button>
+                <button type="button" onClick={() => setActiveTab("dine_out")}>
+                  🍔 Dine Out
+                </button>
+              </div>
 
-      <label>Details:</label>
-      <textarea value={details} onChange={(e) => setDetails(e.target.value)} />
+              {renderSelectedOptions()}
 
-      <h3>Choose Event Options:</h3>
-      <div
-        style={{
-          display: "flex",
-          gap: "1rem",
-          justifyContent: "center",
-          marginBottom: "1rem",
-        }}
-      >
-        <button onClick={() => setActiveTab("pantry")}>🧺 Pantry</button>
-        <button onClick={() => setActiveTab("dine_in")}>🏠 Dine In</button>
-        <button onClick={() => setActiveTab("dine_out")}>🍔 Dine Out</button>
+              {activeTab === "pantry" && (
+                <>
+                  <h4>Pantry Options:</h4>
+                  {renderOptionGrid(pantryOptions, selectedPantry, "pantry")}
+                </>
+              )}
+              {activeTab === "dine_in" && (
+                <>
+                  <h4>Dine In Options:</h4>
+                  {renderOptionGrid(dineInOptions, selectedDineIn, "dine_in")}
+                </>
+              )}
+              {activeTab === "dine_out" && (
+                <>
+                  <h4>Dine Out Options:</h4>
+                  {renderOptionGrid(dineOutOptions, selectedDineOut, "dine_out")}
+                </>
+              )}
+
+              <button type="submit" className="action-button" style={{ marginTop: "1rem" }}>
+                Create Event & Invite Guests
+              </button>
+            </form>
+          </div>
+        </div>
       </div>
-
-      <button onClick={createEvent}>Create Event & Invite Guests</button>
-      {renderSelectedOptions()}
-
-      {activeTab === "pantry" && (
-        <>
-          <h4>Pantry Options:</h4>
-          {renderOptionGrid(pantryOptions, selectedPantry, "pantry")}
-        </>
-      )}
-      {activeTab === "dine_in" && (
-        <>
-          <h4>Dine In Options:</h4>
-          {renderOptionGrid(dineInOptions, selectedDineIn, "dine_in")}
-        </>
-      )}
-      {activeTab === "dine_out" && (
-        <>
-          <h4>Dine Out Options:</h4>
-          {renderOptionGrid(dineOutOptions, selectedDineOut, "dine_out")}
-        </>
-      )}
-    </div>
+      <Footer />
+    </>
   );
-  <Footer />
 }
